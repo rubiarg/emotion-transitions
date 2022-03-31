@@ -1,0 +1,123 @@
+Traceback (most recent call last):
+  File "/Users/rubiarg/.virtualenvs/cpsc554x/lib/python3.9/site-packages/jupyter_cache/executors/utils.py", line 51, in single_nb_execution
+    executenb(
+  File "/Users/rubiarg/.virtualenvs/cpsc554x/lib/python3.9/site-packages/nbclient/client.py", line 1117, in execute
+    return NotebookClient(nb=nb, resources=resources, km=km, **kwargs).execute()
+  File "/Users/rubiarg/.virtualenvs/cpsc554x/lib/python3.9/site-packages/nbclient/util.py", line 78, in wrapped
+    return just_run(coro(*args, **kwargs))
+  File "/Users/rubiarg/.virtualenvs/cpsc554x/lib/python3.9/site-packages/nbclient/util.py", line 57, in just_run
+    return loop.run_until_complete(coro)
+  File "/usr/local/Cellar/python@3.9/3.9.5/Frameworks/Python.framework/Versions/3.9/lib/python3.9/asyncio/base_events.py", line 642, in run_until_complete
+    return future.result()
+  File "/Users/rubiarg/.virtualenvs/cpsc554x/lib/python3.9/site-packages/nbclient/client.py", line 558, in async_execute
+    await self.async_execute_cell(
+  File "/Users/rubiarg/.virtualenvs/cpsc554x/lib/python3.9/site-packages/nbclient/client.py", line 862, in async_execute_cell
+    self._check_raise_for_error(cell, exec_reply)
+  File "/Users/rubiarg/.virtualenvs/cpsc554x/lib/python3.9/site-packages/nbclient/client.py", line 765, in _check_raise_for_error
+    raise CellExecutionError.from_cell_and_msg(cell, exec_reply_content)
+nbclient.exceptions.CellExecutionError: An error occurred while executing the following cell:
+------------------
+"""
+================================
+Gaussian Mixture Model Selection
+================================
+
+Gaussian Mixture Models using information-theoretic criteria (BIC).
+Model selection concerns both the covariance type and the number of components in the model.
+Unlike Bayesian procedures, such inferences are prior-free.
+
+"""
+
+import itertools
+
+from scipy import linalg
+import matplotlib.pyplot as plt
+import matplotlib as mpl
+
+from sklearn import mixture
+
+lowest_bic = np.infty
+bic = []
+n_components_range = range(1, 7)
+cv_types = ["spherical", "tied", "diag", "full"]
+for cv_type in cv_types:
+    for n_components in n_components_range:
+        # Fit a Gaussian mixture with EM
+        gmm = mixture.GaussianMixture(
+            n_components=n_components, covariance_type=cv_type
+        )
+        gmm.fit(X_scaled)
+        bic.append(gmm.bic(X_scaled))
+        if bic[-1] < lowest_bic:
+            lowest_bic = bic[-1]
+            best_gmm = gmm
+
+bic = np.array(bic)
+color_iter = itertools.cycle(['tab:blue', 'tab:orange', 'tab:green', 'tab:red', 'tab:purple', 'tab:brown', 'tab:pink', 'tab:gray', 'tab:olive', 'tab:cyan'])
+clf = best_gmm
+bars = []
+
+# Plot the BIC scores
+plt.figure(figsize=(15, 15))
+spl = plt.subplot(2, 1, 1)
+for i, (cv_type, color) in enumerate(zip(cv_types, color_iter)):
+    xpos = np.array(n_components_range) + 0.2 * (i - 2)
+    bars.append(
+        plt.bar(
+            xpos,
+            bic[i * len(n_components_range) : (i + 1) * len(n_components_range)],
+            width=0.2,
+            color=color,
+        )
+    )
+plt.xticks(n_components_range)
+plt.ylim([bic.min() * 1.01 - 0.01 * bic.max(), bic.max()])
+plt.title("BIC score per model")
+xpos = (
+    np.mod(bic.argmin(), len(n_components_range))
+    + 0.65
+    + 0.2 * np.floor(bic.argmin() / len(n_components_range))
+)
+plt.text(xpos, bic.min() * 0.97 + 0.03 * bic.max(), "*", fontsize=14)
+spl.set_xlabel("Number of components")
+spl.legend([b[0] for b in bars], cv_types)
+
+# Plot the winner
+splot = plt.subplot(2, 1, 2)
+Y_ = clf.predict(X_scaled)
+for i, (mean, cov, color) in enumerate(zip(clf.means_, clf.covariances_, color_iter)):
+    v, w = linalg.eigh(cov)
+    if not np.any(Y_ == i):
+        continue
+    plt.scatter(X_scaled[Y_ == i, 0], X_scaled[Y_ == i, 1], 50, color=color)
+
+plt.legend(range(len(clf.means_)))
+plt.xlabel('Inertia')
+plt.ylabel('Instability')
+plt.title(
+    f"Selected GMM: {best_gmm.covariance_type} model, "
+    f"{best_gmm.n_components} components"
+)
+plt.show()
+
+------------------
+
+[0;31m---------------------------------------------------------------------------[0m
+[0;31mValueError[0m                                Traceback (most recent call last)
+[0;32m/var/folders/bl/2tw1vrc12mv_hqpbdf1j3wkw0000gn/T/ipykernel_11723/296773274.py[0m in [0;36m<module>[0;34m[0m
+[1;32m     68[0m [0mY_[0m [0;34m=[0m [0mclf[0m[0;34m.[0m[0mpredict[0m[0;34m([0m[0mX_scaled[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+[1;32m     69[0m [0;32mfor[0m [0mi[0m[0;34m,[0m [0;34m([0m[0mmean[0m[0;34m,[0m [0mcov[0m[0;34m,[0m [0mcolor[0m[0;34m)[0m [0;32min[0m [0menumerate[0m[0;34m([0m[0mzip[0m[0;34m([0m[0mclf[0m[0;34m.[0m[0mmeans_[0m[0;34m,[0m [0mclf[0m[0;34m.[0m[0mcovariances_[0m[0;34m,[0m [0mcolor_iter[0m[0;34m)[0m[0;34m)[0m[0;34m:[0m[0;34m[0m[0;34m[0m[0m
+[0;32m---> 70[0;31m     [0mv[0m[0;34m,[0m [0mw[0m [0;34m=[0m [0mlinalg[0m[0;34m.[0m[0meigh[0m[0;34m([0m[0mcov[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+[0m[1;32m     71[0m     [0;32mif[0m [0;32mnot[0m [0mnp[0m[0;34m.[0m[0many[0m[0;34m([0m[0mY_[0m [0;34m==[0m [0mi[0m[0;34m)[0m[0;34m:[0m[0;34m[0m[0;34m[0m[0m
+[1;32m     72[0m         [0;32mcontinue[0m[0;34m[0m[0;34m[0m[0m
+
+[0;32m~/.virtualenvs/cpsc554x/lib/python3.9/site-packages/scipy/linalg/decomp.py[0m in [0;36meigh[0;34m(a, b, lower, eigvals_only, overwrite_a, overwrite_b, turbo, eigvals, type, check_finite, subset_by_index, subset_by_value, driver)[0m
+[1;32m    445[0m     [0ma1[0m [0;34m=[0m [0m_asarray_validated[0m[0;34m([0m[0ma[0m[0;34m,[0m [0mcheck_finite[0m[0;34m=[0m[0mcheck_finite[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+[1;32m    446[0m     [0;32mif[0m [0mlen[0m[0;34m([0m[0ma1[0m[0;34m.[0m[0mshape[0m[0;34m)[0m [0;34m!=[0m [0;36m2[0m [0;32mor[0m [0ma1[0m[0;34m.[0m[0mshape[0m[0;34m[[0m[0;36m0[0m[0;34m][0m [0;34m!=[0m [0ma1[0m[0;34m.[0m[0mshape[0m[0;34m[[0m[0;36m1[0m[0;34m][0m[0;34m:[0m[0;34m[0m[0;34m[0m[0m
+[0;32m--> 447[0;31m         [0;32mraise[0m [0mValueError[0m[0;34m([0m[0;34m'expected square "a" matrix'[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+[0m[1;32m    448[0m     [0moverwrite_a[0m [0;34m=[0m [0moverwrite_a[0m [0;32mor[0m [0;34m([0m[0m_datacopied[0m[0;34m([0m[0ma1[0m[0;34m,[0m [0ma[0m[0;34m)[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+[1;32m    449[0m     [0mcplx[0m [0;34m=[0m [0;32mTrue[0m [0;32mif[0m [0miscomplexobj[0m[0;34m([0m[0ma1[0m[0;34m)[0m [0;32melse[0m [0;32mFalse[0m[0;34m[0m[0;34m[0m[0m
+
+[0;31mValueError[0m: expected square "a" matrix
+ValueError: expected square "a" matrix
+
