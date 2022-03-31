@@ -220,6 +220,11 @@ const thebe_selector_output = ".output, .cell_output"
   </a>
   <ul class="nav section-nav flex-column">
    <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#data-preprocessing-scaling">
+     Data preprocessing: scaling
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
     <a class="reference internal nav-link" href="#pairplot-analysis">
      Pairplot analysis
     </a>
@@ -574,6 +579,9 @@ const thebe_selector_output = ".output, .cell_output"
 </table>
 </div></div></div>
 </div>
+<div class="section" id="data-preprocessing-scaling">
+<h3>Data preprocessing: scaling<a class="headerlink" href="#data-preprocessing-scaling" title="Permalink to this headline">¶</a></h3>
+<p>Standardize features by removing the mean and scaling to unit variance.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">StandardScaler</span>
@@ -603,8 +611,8 @@ const thebe_selector_output = ".output, .cell_output"
     <tr style="text-align: right;">
       <th></th>
       <th>Variability</th>
-      <th>Inertia</th>
       <th>Instability</th>
+      <th>Inertia</th>
     </tr>
   </thead>
   <tbody>
@@ -642,6 +650,7 @@ const thebe_selector_output = ".output, .cell_output"
 </table>
 </div></div></div>
 </div>
+</div>
 <div class="section" id="pairplot-analysis">
 <h3>Pairplot analysis<a class="headerlink" href="#pairplot-analysis" title="Permalink to this headline">¶</a></h3>
 <div class="cell docutils container">
@@ -651,7 +660,7 @@ const thebe_selector_output = ".output, .cell_output"
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="_images/feeltrace-clustering_16_0.png" src="_images/feeltrace-clustering_16_0.png" />
+<img alt="_images/feeltrace-clustering_17_0.png" src="_images/feeltrace-clustering_17_0.png" />
 </div>
 </div>
 </div>
@@ -670,11 +679,8 @@ const thebe_selector_output = ".output, .cell_output"
 
 <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">X_scaled</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">X_scaled</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">X_scaled</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">],</span> <span class="n">cmap</span><span class="o">=</span><span class="n">plt</span><span class="o">.</span><span class="n">cm</span><span class="o">.</span><span class="n">nipy_spectral</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s2">&quot;k&quot;</span><span class="p">)</span>
 
-<span class="n">ax</span><span class="o">.</span><span class="n">w_xaxis</span><span class="o">.</span><span class="n">set_ticklabels</span><span class="p">([])</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Inertia&#39;</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">w_yaxis</span><span class="o">.</span><span class="n">set_ticklabels</span><span class="p">([])</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Instability&#39;</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">w_zaxis</span><span class="o">.</span><span class="n">set_ticklabels</span><span class="p">([])</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_zlabel</span><span class="p">(</span><span class="s1">&#39;Variability&#39;</span><span class="p">)</span>
 
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
@@ -682,7 +688,7 @@ const thebe_selector_output = ".output, .cell_output"
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="_images/feeltrace-clustering_18_0.png" src="_images/feeltrace-clustering_18_0.png" />
+<img alt="_images/feeltrace-clustering_19_0.png" src="_images/feeltrace-clustering_19_0.png" />
 </div>
 </div>
 </div>
@@ -704,7 +710,7 @@ const thebe_selector_output = ".output, .cell_output"
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="_images/feeltrace-clustering_20_0.png" src="_images/feeltrace-clustering_20_0.png" />
+<img alt="_images/feeltrace-clustering_21_0.png" src="_images/feeltrace-clustering_21_0.png" />
 </div>
 </div>
 </div>
@@ -748,7 +754,7 @@ const thebe_selector_output = ".output, .cell_output"
             <span class="n">best_gmm</span> <span class="o">=</span> <span class="n">gmm</span>
 
 <span class="n">bic</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">bic</span><span class="p">)</span>
-<span class="n">color_iter</span> <span class="o">=</span> <span class="n">itertools</span><span class="o">.</span><span class="n">cycle</span><span class="p">([</span><span class="s2">&quot;navy&quot;</span><span class="p">,</span> <span class="s2">&quot;turquoise&quot;</span><span class="p">,</span> <span class="s2">&quot;cornflowerblue&quot;</span><span class="p">,</span> <span class="s2">&quot;darkorange&quot;</span><span class="p">])</span>
+<span class="n">color_iter</span> <span class="o">=</span> <span class="n">itertools</span><span class="o">.</span><span class="n">cycle</span><span class="p">([</span><span class="s1">&#39;tab:blue&#39;</span><span class="p">,</span> <span class="s1">&#39;tab:orange&#39;</span><span class="p">,</span> <span class="s1">&#39;tab:green&#39;</span><span class="p">,</span> <span class="s1">&#39;tab:red&#39;</span><span class="p">,</span> <span class="s1">&#39;tab:purple&#39;</span><span class="p">,</span> <span class="s1">&#39;tab:brown&#39;</span><span class="p">,</span> <span class="s1">&#39;tab:pink&#39;</span><span class="p">,</span> <span class="s1">&#39;tab:gray&#39;</span><span class="p">,</span> <span class="s1">&#39;tab:olive&#39;</span><span class="p">,</span> <span class="s1">&#39;tab:cyan&#39;</span><span class="p">])</span>
 <span class="n">clf</span> <span class="o">=</span> <span class="n">best_gmm</span>
 <span class="n">bars</span> <span class="o">=</span> <span class="p">[]</span>
 
@@ -784,11 +790,11 @@ const thebe_selector_output = ".output, .cell_output"
     <span class="n">v</span><span class="p">,</span> <span class="n">w</span> <span class="o">=</span> <span class="n">linalg</span><span class="o">.</span><span class="n">eigh</span><span class="p">(</span><span class="n">cov</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">Y_</span> <span class="o">==</span> <span class="n">i</span><span class="p">):</span>
         <span class="k">continue</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">X_scaled</span><span class="p">[</span><span class="n">Y_</span> <span class="o">==</span> <span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">X_scaled</span><span class="p">[</span><span class="n">Y_</span> <span class="o">==</span> <span class="n">i</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="mi">20</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">X_scaled</span><span class="p">[</span><span class="n">Y_</span> <span class="o">==</span> <span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">X_scaled</span><span class="p">[</span><span class="n">Y_</span> <span class="o">==</span> <span class="n">i</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="mi">50</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">)</span>
 
 <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">clf</span><span class="o">.</span><span class="n">means_</span><span class="p">)))</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">(())</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">yticks</span><span class="p">(())</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Inertia&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Instability&#39;</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span>
     <span class="sa">f</span><span class="s2">&quot;Selected GMM: </span><span class="si">{</span><span class="n">best_gmm</span><span class="o">.</span><span class="n">covariance_type</span><span class="si">}</span><span class="s2"> model, &quot;</span>
     <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">best_gmm</span><span class="o">.</span><span class="n">n_components</span><span class="si">}</span><span class="s2"> components&quot;</span>
@@ -798,7 +804,7 @@ const thebe_selector_output = ".output, .cell_output"
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="_images/feeltrace-clustering_22_0.png" src="_images/feeltrace-clustering_22_0.png" />
+<img alt="_images/feeltrace-clustering_23_0.png" src="_images/feeltrace-clustering_23_0.png" />
 </div>
 </div>
 </div>

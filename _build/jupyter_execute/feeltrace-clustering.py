@@ -147,6 +147,9 @@ X = X_train.append(X_test).reset_index(drop=True)
 X.head()
 
 
+# #### Data preprocessing: scaling
+# Standardize features by removing the mean and scaling to unit variance.
+
 # In[11]:
 
 
@@ -179,11 +182,8 @@ fig.add_axes(ax)
 
 ax.scatter(X_scaled[:, 0], X_scaled[:, 1], X_scaled[:, 2], cmap=plt.cm.nipy_spectral, edgecolor="k")
 
-ax.w_xaxis.set_ticklabels([])
 ax.set_xlabel('Inertia')
-ax.w_yaxis.set_ticklabels([])
 ax.set_ylabel('Instability')
-ax.w_zaxis.set_ticklabels([])
 ax.set_zlabel('Variability')
 
 plt.show()
@@ -247,7 +247,7 @@ for cv_type in cv_types:
             best_gmm = gmm
 
 bic = np.array(bic)
-color_iter = itertools.cycle(["navy", "turquoise", "cornflowerblue", "darkorange"])
+color_iter = itertools.cycle(['tab:blue', 'tab:orange', 'tab:green', 'tab:red', 'tab:purple', 'tab:brown', 'tab:pink', 'tab:gray', 'tab:olive', 'tab:cyan'])
 clf = best_gmm
 bars = []
 
@@ -283,11 +283,11 @@ for i, (mean, cov, color) in enumerate(zip(clf.means_, clf.covariances_, color_i
     v, w = linalg.eigh(cov)
     if not np.any(Y_ == i):
         continue
-    plt.scatter(X_scaled[Y_ == i, 0], X_scaled[Y_ == i, 1], 20, color=color)
+    plt.scatter(X_scaled[Y_ == i, 0], X_scaled[Y_ == i, 1], 50, color=color)
 
 plt.legend(range(len(clf.means_)))
-plt.xticks(())
-plt.yticks(())
+plt.xlabel('Inertia')
+plt.ylabel('Instability')
 plt.title(
     f"Selected GMM: {best_gmm.covariance_type} model, "
     f"{best_gmm.n_components} components"
