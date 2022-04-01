@@ -154,16 +154,11 @@ X = X_train.append(X_test).reset_index(drop=True)
 X.head()
 
 
-# #### Data preprocessing: scaling
-# Standardize features by removing the mean and scaling to unit variance.
-
 # In[11]:
 
 
-from sklearn.preprocessing import StandardScaler
-scaler = StandardScaler()
-X_scaled = scaler.fit_transform(X)
-pd.DataFrame(X_scaled, columns={'Inertia', 'Instability', 'Variability'}).head()
+max_ = pd.Series(map(lambda x: x*1.2 if  x > 0 else x*0.8, X.max()), ['Inertia', 'Instability', 'Variability'])
+min_ = pd.Series(map(lambda x: x*1.2 if  x < 0 else x*0.8, X.min()), ['Inertia', 'Instability', 'Variability'])
 
 
 # #### Pairplot analysis
@@ -171,12 +166,54 @@ pd.DataFrame(X_scaled, columns={'Inertia', 'Instability', 'Variability'}).head()
 # In[12]:
 
 
-sns.pairplot(X);
+grid = sns.pairplot(X);
+
+# x-axis limits
+grid.axes[0,0].set_xlim((min_.Inertia,max_.Inertia))
+grid.axes[0,1].set_xlim((min_.Instability,max_.Instability))
+grid.axes[0,2].set_xlim((min_.Variability,max_.Variability))
+grid.axes[1,0].set_xlim((min_.Inertia,max_.Inertia))
+grid.axes[1,1].set_xlim((min_.Instability,max_.Instability))
+grid.axes[1,2].set_xlim((min_.Variability,max_.Variability))
+grid.axes[2,0].set_xlim((min_.Inertia,max_.Inertia))
+grid.axes[2,1].set_xlim((min_.Instability,max_.Instability))
+grid.axes[2,2].set_xlim((min_.Variability,max_.Variability))
+
+# y-axis limits
+grid.axes[0,0].set_ylim((min_.Inertia,max_.Inertia))
+grid.axes[0,1].set_ylim((min_.Inertia,max_.Inertia))
+grid.axes[0,2].set_ylim((min_.Inertia,max_.Inertia))
+grid.axes[1,0].set_ylim((min_.Instability,max_.Instability))
+grid.axes[1,1].set_ylim((min_.Instability,max_.Instability))
+grid.axes[1,2].set_ylim((min_.Instability,max_.Instability))
+grid.axes[2,0].set_ylim((min_.Variability,max_.Variability))
+grid.axes[2,1].set_ylim((min_.Variability,max_.Variability))
+grid.axes[2,2].set_ylim((min_.Variability,max_.Variability))
+
+
+# #### Data preprocessing: scaling
+# Standardize features by removing the mean and scaling to unit variance.
+
+# In[13]:
+
+
+from sklearn.preprocessing import StandardScaler
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
+X_scaled = pd.DataFrame(X_scaled, columns={'Inertia', 'Instability', 'Variability'})
+X_scaled.head()
+
+
+# In[14]:
+
+
+max_scaled = pd.Series(map(lambda x: x*1.2 if  x > 0 else x*0.8, X_scaled.max()), ['Inertia', 'Instability', 'Variability'])
+min_scaled = pd.Series(map(lambda x: x*1.2 if  x < 0 else x*0.8, X_scaled.min()), ['Inertia', 'Instability', 'Variability'])
 
 
 # ### 3D scatterplot
 
-# In[13]:
+# In[15]:
 
 
 import numpy as np
@@ -187,7 +224,7 @@ fig = plt.figure()
 ax = Axes3D(fig, rect=[0, 0, 0.95, 1], elev=48, azim=130, auto_add_to_figure=False)
 fig.add_axes(ax)
 
-ax.scatter(X_scaled[:, 0], X_scaled[:, 1], X_scaled[:, 2], cmap=plt.cm.nipy_spectral, edgecolor="k")
+ax.scatter(X_scaled.Inertia, X_scaled.Instability, X_scaled.Variability, cmap=plt.cm.nipy_spectral, edgecolor="k")
 
 ax.set_xlabel('Inertia')
 ax.set_ylabel('Instability')
@@ -198,7 +235,7 @@ plt.show()
 
 # ### Principal Component Analysis
 
-# In[14]:
+# In[16]:
 
 
 import numpy as np
@@ -215,7 +252,7 @@ sns.scatterplot(x=X_PCA[:, 0], y=X_PCA[:, 1]);
 
 # ### Gaussian Mixture Model
 
-# In[15]:
+# In[17]:
 
 
 """
@@ -286,7 +323,7 @@ for i, (mean, cov, color) in enumerate(zip(clf.means_, clf.covariances_, color_i
     v, w = linalg.eigh(cov)
     if not np.any(Y_ == i):
         continue
-    plt.scatter(X_scaled[Y_ == i, 0], X_scaled[Y_ == i, 1], 50, color=color)
+    plt.scatter(X_scaled.Inertia.loc[Y_ == i], X_scaled.Instability.loc[Y_ == i], 50, color=color)
 
 plt.legend(range(len(clf.means_)))
 plt.xlabel('Inertia')
@@ -308,7 +345,7 @@ plt.show()
 # 
 # Each feeltrace is split in 30 sec chunks, then analyzed within participant.
 
-# In[16]:
+# In[18]:
 
 
 participant_split = {}
@@ -319,14 +356,55 @@ for index, subject in enumerate(train):
     participant_split[index] = np.array_split(feeltrace, n_chunks)
 
 
-# In[17]:
+# In[19]:
 
 
 ed_participant = {}
+grids = []
+X_participant_dfs = []
+
 for index, participant in enumerate(participant_split.items()):
     ed_participant[index] = list(map(ED.get_parameters, participant[1]))
-    X_participant = pd.DataFrame(ed_participant[index])
-    sns.pairplot(X_participant);
+    X_participant_dfs.append(pd.DataFrame(ed_participant[index]))
+
+from functools import reduce
+X_participants = reduce(lambda x, y: pd.concat([x,y], ignore_index = True, sort = False), X_participant_dfs)
+
+
+# In[20]:
+
+
+max_ = pd.Series(map(lambda x: x*1.2 if  x > 0 else x*0.8, X_participants.max()), ['Inertia', 'Instability', 'Variability'])
+min_ = pd.Series(map(lambda x: x*1.2 if  x < 0 else x*0.8, X_participants.min()), ['Inertia', 'Instability', 'Variability'])
+
+
+# In[21]:
+
+
+
+for index, participant in enumerate(participant_split.items()):    
+X_participant = pd.DataFrame(ed_participant[index])
+grid = sns.pairplot(X_participant);# x-axis limits
+grid.axes[0,0].set_xlim((min_.Inertia,max_.Inertia))
+grid.axes[0,1].set_xlim((min_.Instability,max_.Instability))
+grid.axes[0,2].set_xlim((min_.Variability,max_.Variability))
+grid.axes[1,0].set_xlim((min_.Inertia,max_.Inertia))
+grid.axes[1,1].set_xlim((min_.Instability,max_.Instability))
+grid.axes[1,2].set_xlim((min_.Variability,max_.Variability))
+grid.axes[2,0].set_xlim((min_.Inertia,max_.Inertia))
+grid.axes[2,1].set_xlim((min_.Instability,max_.Instability))
+grid.axes[2,2].set_xlim((min_.Variability,max_.Variability))
+
+# y-axis limits
+grid.axes[0,0].set_ylim((min_.Inertia,max_.Inertia))
+grid.axes[0,1].set_ylim((min_.Inertia,max_.Inertia))
+grid.axes[0,2].set_ylim((min_.Inertia,max_.Inertia))
+grid.axes[1,0].set_ylim((min_.Instability,max_.Instability))
+grid.axes[1,1].set_ylim((min_.Instability,max_.Instability))
+grid.axes[1,2].set_ylim((min_.Instability,max_.Instability))
+grid.axes[2,0].set_ylim((min_.Variability,max_.Variability))
+grid.axes[2,1].set_ylim((min_.Variability,max_.Variability))
+grid.axes[2,2].set_ylim((min_.Variability,max_.Variability))
 
 
 # In[ ]:
