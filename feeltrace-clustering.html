@@ -252,6 +252,11 @@ const thebe_selector_output = ".output, .cell_output"
    Gaussian Mixture Model
   </a>
  </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#within-participant-analysis">
+   Within-participant analysis
+  </a>
+ </li>
 </ul>
 
             </nav>
@@ -272,6 +277,7 @@ const thebe_selector_output = ".output, .cell_output"
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">matplotlib</span> <span class="k">as</span> <span class="nn">mpl</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">glob</span>
@@ -279,6 +285,7 @@ const thebe_selector_output = ".output, .cell_output"
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="kn">import</span> <span class="nn">scipy.io</span> <span class="k">as</span> <span class="nn">sio</span>
 <span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+
 <span class="kn">from</span> <span class="nn">scipy</span> <span class="kn">import</span> <span class="n">signal</span>
 <span class="kn">from</span> <span class="nn">statsmodels.tsa</span> <span class="kn">import</span> <span class="n">stattools</span>
 
@@ -362,7 +369,11 @@ const thebe_selector_output = ".output, .cell_output"
     <span class="k">def</span> <span class="nf">emotional_inertia</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">lag</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">lag</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">lag</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lag</span>
-        <span class="k">return</span> <span class="n">stattools</span><span class="o">.</span><span class="n">acf</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">nlags</span><span class="o">=</span><span class="n">lag</span><span class="p">)[</span><span class="n">lag</span><span class="p">]</span> <span class="c1"># Autocorrelation</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">stattools</span><span class="o">.</span><span class="n">acf</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">nlags</span><span class="o">=</span><span class="n">lag</span><span class="p">)[</span><span class="n">lag</span><span class="p">]</span> <span class="c1"># Autocorrelation</span>
+        <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">stattools</span><span class="o">.</span><span class="n">acf</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">nlags</span><span class="o">=</span><span class="mi">700</span><span class="p">)[</span><span class="mi">700</span><span class="p">]</span> <span class="c1"># Autocorrelation</span>
+
     
     <span class="k">def</span> <span class="nf">get_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
         <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
@@ -399,6 +410,7 @@ const thebe_selector_output = ".output, .cell_output"
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">training_data</span> <span class="o">=</span> <span class="p">[]</span>
+
 <span class="k">for</span> <span class="n">subject</span> <span class="ow">in</span> <span class="n">train</span><span class="p">:</span>
     <span class="n">feeltrace</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">subject</span><span class="p">[</span><span class="s1">&#39;Feeltrace&#39;</span><span class="p">])</span>
     <span class="n">training_data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ED</span><span class="o">.</span><span class="n">get_parameters</span><span class="p">(</span><span class="n">feeltrace</span><span class="p">))</span>
@@ -616,9 +628,9 @@ const thebe_selector_output = ".output, .cell_output"
   <thead>
     <tr style="text-align: right;">
       <th></th>
-      <th>Inertia</th>
-      <th>Instability</th>
       <th>Variability</th>
+      <th>Instability</th>
+      <th>Inertia</th>
     </tr>
   </thead>
   <tbody>
@@ -736,11 +748,7 @@ const thebe_selector_output = ".output, .cell_output"
 <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="kn">import</span> <span class="nn">itertools</span>
-
 <span class="kn">from</span> <span class="nn">scipy</span> <span class="kn">import</span> <span class="n">linalg</span>
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-<span class="kn">import</span> <span class="nn">matplotlib</span> <span class="k">as</span> <span class="nn">mpl</span>
-
 <span class="kn">from</span> <span class="nn">sklearn</span> <span class="kn">import</span> <span class="n">mixture</span>
 
 <span class="n">lowest_bic</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">infty</span>
@@ -811,6 +819,49 @@ const thebe_selector_output = ".output, .cell_output"
 </div>
 <div class="cell_output docutils container">
 <img alt="_images/feeltrace-clustering_23_0.png" src="_images/feeltrace-clustering_23_0.png" />
+</div>
+</div>
+</div>
+<div class="section" id="within-participant-analysis">
+<h2>Within-participant analysis<a class="headerlink" href="#within-participant-analysis" title="Permalink to this headline">¶</a></h2>
+<p>The main takeaway so far seems to be that there are no direct archetypes or patterns of response. This seems to suggest that personalized models make sense, given that each participant’s response is distinct.</p>
+<p>Below is an attempt to address KM’s comment:</p>
+<p><code class="docutils literal notranslate"><span class="pre">Is</span> <span class="pre">there</span> <span class="pre">any</span> <span class="pre">more</span> <span class="pre">evidence</span> <span class="pre">that's</span> <span class="pre">it's</span> <span class="pre">individualized?</span> <span class="pre">Is</span> <span class="pre">within-participant</span> <span class="pre">behavior</span> <span class="pre">consistent?</span></code></p>
+<p>Each feeltrace is split in 30 sec chunks, then analyzed within participant.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">participant_split</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="n">n_samples</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="mi">30</span><span class="o">*</span><span class="mf">0.5</span><span class="o">*</span><span class="mi">60</span><span class="p">)</span> <span class="c1"># sampling rate x n_seconds (3 min)</span>
+<span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">subject</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">train</span><span class="p">):</span>
+    <span class="n">feeltrace</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">subject</span><span class="p">[</span><span class="s1">&#39;Feeltrace&#39;</span><span class="p">])</span>
+    <span class="n">n_chunks</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">feeltrace</span><span class="p">)</span><span class="o">/</span><span class="n">n_samples</span><span class="p">)</span>
+    <span class="n">participant_split</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array_split</span><span class="p">(</span><span class="n">feeltrace</span><span class="p">,</span> <span class="n">n_chunks</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ed_participant</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">participant</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">participant_split</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
+    <span class="n">ed_participant</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">ED</span><span class="o">.</span><span class="n">get_parameters</span><span class="p">,</span> <span class="n">participant</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+    <span class="n">X_participant</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">ed_participant</span><span class="p">[</span><span class="n">index</span><span class="p">])</span>
+    <span class="n">sns</span><span class="o">.</span><span class="n">pairplot</span><span class="p">(</span><span class="n">X_participant</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/feeltrace-clustering_27_0.png" src="_images/feeltrace-clustering_27_0.png" />
+<img alt="_images/feeltrace-clustering_27_1.png" src="_images/feeltrace-clustering_27_1.png" />
+<img alt="_images/feeltrace-clustering_27_2.png" src="_images/feeltrace-clustering_27_2.png" />
+<img alt="_images/feeltrace-clustering_27_3.png" src="_images/feeltrace-clustering_27_3.png" />
+<img alt="_images/feeltrace-clustering_27_4.png" src="_images/feeltrace-clustering_27_4.png" />
+<img alt="_images/feeltrace-clustering_27_5.png" src="_images/feeltrace-clustering_27_5.png" />
+<img alt="_images/feeltrace-clustering_27_6.png" src="_images/feeltrace-clustering_27_6.png" />
+<img alt="_images/feeltrace-clustering_27_7.png" src="_images/feeltrace-clustering_27_7.png" />
+<img alt="_images/feeltrace-clustering_27_8.png" src="_images/feeltrace-clustering_27_8.png" />
+<img alt="_images/feeltrace-clustering_27_9.png" src="_images/feeltrace-clustering_27_9.png" />
+<img alt="_images/feeltrace-clustering_27_10.png" src="_images/feeltrace-clustering_27_10.png" />
 </div>
 </div>
 </div>
