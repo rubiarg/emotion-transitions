@@ -12,6 +12,7 @@
 
 
 import matplotlib.pyplot as plt
+import matplotlib as mpl
 import numpy as np
 import os
 import glob
@@ -19,6 +20,7 @@ import re
 import pandas as pd
 import scipy.io as sio
 import seaborn as sns
+
 from scipy import signal
 from statsmodels.tsa import stattools
 
@@ -91,7 +93,11 @@ class EmotionDynamics:
     def emotional_inertia(self, X, lag=None):
         if lag is None:
             lag = self.lag
-        return stattools.acf(X, nlags=lag)[lag] # Autocorrelation
+        try:
+            return stattools.acf(X, nlags=lag)[lag] # Autocorrelation
+        except IndexError:
+            return stattools.acf(X, nlags=700)[700] # Autocorrelation
+
     
     def get_parameters(self, X):
         X = np.array(X)
@@ -118,6 +124,7 @@ ED.get_parameters(train[1]['Feeltrace'])
 
 
 training_data = []
+
 for subject in train:
     feeltrace = np.array(subject['Feeltrace'])
     training_data.append(ED.get_parameters(feeltrace))
@@ -223,11 +230,7 @@ Unlike Bayesian procedures, such inferences are prior-free.
 """
 
 import itertools
-
 from scipy import linalg
-import matplotlib.pyplot as plt
-import matplotlib as mpl
-
 from sklearn import mixture
 
 lowest_bic = np.infty
@@ -293,6 +296,37 @@ plt.title(
     f"{best_gmm.n_components} components"
 )
 plt.show()
+
+
+# ### Within-participant analysis
+
+# The main takeaway so far seems to be that there are no direct archetypes or patterns of response. This seems to suggest that personalized models make sense, given that each participant's response is distinct.
+# 
+# Below is an attempt to address KM's comment:
+# 
+# ```Is there any more evidence that's it's individualized? Is within-participant behavior consistent?```
+# 
+# Each feeltrace is split in 30 sec chunks, then analyzed within participant.
+
+# In[16]:
+
+
+participant_split = {}
+n_samples = int(30*0.5*60) # sampling rate x n_seconds (3 min)
+for index, subject in enumerate(train):
+    feeltrace = np.array(subject['Feeltrace'])
+    n_chunks = int(len(feeltrace)/n_samples)
+    participant_split[index] = np.array_split(feeltrace, n_chunks)
+
+
+# In[17]:
+
+
+ed_participant = {}
+for index, participant in enumerate(participant_split.items()):
+    ed_participant[index] = list(map(ED.get_parameters, participant[1]))
+    X_participant = pd.DataFrame(ed_participant[index])
+    sns.pairplot(X_participant);
 
 
 # In[ ]:
