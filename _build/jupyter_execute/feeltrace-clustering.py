@@ -304,7 +304,7 @@ plt.show()
 # 
 # Below is an attempt to address KM's comment:
 # 
-# ```Is there any more evidence that's it's individualized? Is within-participant behavior consistent?```
+# ```Is there any more evidence that it is indeed individualized? Is within-participant behavior consistent?```
 # 
 # Each feeltrace is split in 30 sec chunks, then analyzed within participant.
 
