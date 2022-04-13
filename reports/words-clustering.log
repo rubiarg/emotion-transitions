@@ -104,7 +104,7 @@ plt.show()
 
 [0;31m---------------------------------------------------------------------------[0m
 [0;31mValueError[0m                                Traceback (most recent call last)
-[0;32m/var/folders/bl/2tw1vrc12mv_hqpbdf1j3wkw0000gn/T/ipykernel_11723/296773274.py[0m in [0;36m<module>[0;34m[0m
+[0;32m/var/folders/bl/2tw1vrc12mv_hqpbdf1j3wkw0000gn/T/ipykernel_16072/296773274.py[0m in [0;36m<module>[0;34m[0m
 [1;32m     68[0m [0mY_[0m [0;34m=[0m [0mclf[0m[0;34m.[0m[0mpredict[0m[0;34m([0m[0mX_scaled[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
 [1;32m     69[0m [0;32mfor[0m [0mi[0m[0;34m,[0m [0;34m([0m[0mmean[0m[0;34m,[0m [0mcov[0m[0;34m,[0m [0mcolor[0m[0;34m)[0m [0;32min[0m [0menumerate[0m[0;34m([0m[0mzip[0m[0;34m([0m[0mclf[0m[0;34m.[0m[0mmeans_[0m[0;34m,[0m [0mclf[0m[0;34m.[0m[0mcovariances_[0m[0;34m,[0m [0mcolor_iter[0m[0;34m)[0m[0;34m)[0m[0;34m:[0m[0;34m[0m[0;34m[0m[0m
 [0;32m---> 70[0;31m     [0mv[0m[0;34m,[0m [0mw[0m [0;34m=[0m [0mlinalg[0m[0;34m.[0m[0meigh[0m[0;34m([0m[0mcov[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
