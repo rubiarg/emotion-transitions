@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# # Continuous self-report analysis
+# # Calibrated words self-report analysis
 # Rubia Guerra
 # 
 # Last updated: Apr 12th 2022
