@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# # Calibrated words analysis
+# # Feeltrace and calibrated words analysis
 # Rubia Guerra
 # 
-# Last updated: Mar 31st 2022
+# Last updated: Apr 13th 2022
 
 # ### Module definitions
 
@@ -32,17 +32,9 @@ plt.style.use("seaborn")
 get_ipython().run_line_magic('matplotlib', 'inline')
 
 
-# In[2]:
-
-
-data_dir = '../EEG/data/p*'
-subject_data_files = glob.glob(os.path.join(data_dir, 'calibrated_words_calibrated_values.mat'))
-mat_contents = sio.loadmat(subject_data_files[1])
-
-
 # ### Import data
 
-# In[3]:
+# In[2]:
 
 
 def load_and_split_dataset(data_dir = '../EEG/data/p*', split_size=100, random_seed=128, split_ratio = .7, subject_choice_seed=128):
@@ -71,7 +63,7 @@ def load_and_split_dataset(data_dir = '../EEG/data/p*', split_size=100, random_s
     return train, test
 
 
-# In[4]:
+# In[3]:
 
 
 [train, test] = load_and_split_dataset()
@@ -84,7 +76,7 @@ def load_and_split_dataset(data_dir = '../EEG/data/p*', split_size=100, random_s
 # - **Emotional instability:** refers to the magnitude of emotional changes from one moment to the next. An individual characterized by high levels of instability experiences larger emotional shifts from one moment to the next, resulting in a more unstable emotional life.
 # - **Emotional variability:** refers to the range or amplitude of someone’s emotional states across time. An individual characterized by higher levels of emotional variability experiences emotions that reach more extreme levels and shows larger emotional deviations from his or her average emotional level
 
-# In[5]:
+# In[4]:
 
 
 class EmotionDynamics:
@@ -111,19 +103,19 @@ class EmotionDynamics:
         return parameters
 
 
-# In[6]:
+# In[5]:
 
 
 ED = EmotionDynamics()
 
 
-# In[7]:
+# In[6]:
 
 
 ED.get_parameters(train[1]['Calibrated values'])
 
 
-# In[8]:
+# In[7]:
 
 
 training_data = []
@@ -132,7 +124,7 @@ for subject in train:
     training_data.append(ED.get_parameters(calibrated_values))
 
 
-# In[9]:
+# In[8]:
 
 
 test_data = []
@@ -141,7 +133,7 @@ for subject in test:
     test_data.append(ED.get_parameters(calibrated_values))
 
 
-# In[10]:
+# In[9]:
 
 
 X_train = pd.DataFrame(training_data)
@@ -149,7 +141,7 @@ X_test = pd.DataFrame(test_data)
 X_train
 
 
-# In[11]:
+# In[10]:
 
 
 X = X_train.append(X_test).reset_index(drop=True)
@@ -159,7 +151,7 @@ X.head()
 # #### Data preprocessing: scaling
 # Standardize features by removing the mean and scaling to unit variance.
 
-# In[12]:
+# In[11]:
 
 
 from sklearn.preprocessing import StandardScaler
@@ -170,7 +162,7 @@ pd.DataFrame(X_scaled, columns={'Inertia', 'Instability', 'Variability'}).head()
 
 # #### Pairplot analysis
 
-# In[13]:
+# In[12]:
 
 
 sns.pairplot(X);
@@ -178,7 +170,7 @@ sns.pairplot(X);
 
 # ### 3D scatterplot
 
-# In[14]:
+# In[13]:
 
 
 import numpy as np
@@ -200,7 +192,7 @@ plt.show()
 
 # ### Principal Component Analysis
 
-# In[15]:
+# In[14]:
 
 
 import numpy as np
@@ -217,7 +209,7 @@ sns.scatterplot(x=X_PCA[:, 0], y=X_PCA[:, 1]);
 
 # ### Gaussian Mixture Model
 
-# In[16]:
+# In[15]:
 
 
 """

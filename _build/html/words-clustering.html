@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Calibrated words analysis &#8212; Emotion Transitions Analysis</title>
+    <title>Feeltrace and calibrated words analysis &#8212; Emotion Transitions Analysis</title>
     
   <link href="_static/css/theme.css" rel="stylesheet" />
   <link href="_static/css/index.c5995385ac14fb8791e8eb36b4908be2.css" rel="stylesheet" />
@@ -53,7 +53,6 @@ const thebe_selector_output = ".output, .cell_output"
     <script async="async" src="_static/sphinx-thebe.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="prev" title="Intro" href="intro.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="en" />
     
@@ -94,10 +93,15 @@ const thebe_selector_output = ".output, .cell_output"
   </a>
  </li>
 </ul>
-<ul class="current nav bd-sidenav">
- <li class="toctree-l1 current active">
-  <a class="current reference internal" href="#">
-   Calibrated words analysis
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="feeltrace.html">
+   Continuous self-report analysis
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="calibrated-words.html">
+   Continuous self-report analysis
   </a>
  </li>
 </ul>
@@ -257,10 +261,10 @@ const thebe_selector_output = ".output, .cell_output"
         
               <div>
                 
-  <div class="tex2jax_ignore mathjax_ignore section" id="calibrated-words-analysis">
-<h1>Calibrated words analysis<a class="headerlink" href="#calibrated-words-analysis" title="Permalink to this headline">¶</a></h1>
+  <div class="tex2jax_ignore mathjax_ignore section" id="feeltrace-and-calibrated-words-analysis">
+<h1>Feeltrace and calibrated words analysis<a class="headerlink" href="#feeltrace-and-calibrated-words-analysis" title="Permalink to this headline">¶</a></h1>
 <p>Rubia Guerra</p>
-<p>Last updated: Mar 31st 2022</p>
+<p>Last updated: Apr 13th 2022</p>
 <div class="section" id="module-definitions">
 <h2>Module definitions<a class="headerlink" href="#module-definitions" title="Permalink to this headline">¶</a></h2>
 <div class="cell docutils container">
@@ -284,15 +288,6 @@ const thebe_selector_output = ".output, .cell_output"
 <span class="n">plt</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="s2">&quot;seaborn&quot;</span><span class="p">)</span>
 
 <span class="o">%</span><span class="k">matplotlib</span> inline
-</pre></div>
-</div>
-</div>
-</div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">data_dir</span> <span class="o">=</span> <span class="s1">&#39;../EEG/data/p*&#39;</span>
-<span class="n">subject_data_files</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data_dir</span><span class="p">,</span> <span class="s1">&#39;calibrated_words_calibrated_values.mat&#39;</span><span class="p">))</span>
-<span class="n">mat_contents</span> <span class="o">=</span> <span class="n">sio</span><span class="o">.</span><span class="n">loadmat</span><span class="p">(</span><span class="n">subject_data_files</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
 </pre></div>
 </div>
 </div>
@@ -620,8 +615,8 @@ const thebe_selector_output = ".output, .cell_output"
   <thead>
     <tr style="text-align: right;">
       <th></th>
-      <th>Instability</th>
       <th>Variability</th>
+      <th>Instability</th>
       <th>Inertia</th>
     </tr>
   </thead>
@@ -670,7 +665,7 @@ const thebe_selector_output = ".output, .cell_output"
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="_images/words-clustering_18_0.png" src="_images/words-clustering_18_0.png" />
+<img alt="_images/words-clustering_17_0.png" src="_images/words-clustering_17_0.png" />
 </div>
 </div>
 </div>
@@ -698,7 +693,7 @@ const thebe_selector_output = ".output, .cell_output"
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="_images/words-clustering_20_0.png" src="_images/words-clustering_20_0.png" />
+<img alt="_images/words-clustering_19_0.png" src="_images/words-clustering_19_0.png" />
 </div>
 </div>
 </div>
@@ -720,7 +715,7 @@ const thebe_selector_output = ".output, .cell_output"
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="_images/words-clustering_22_0.png" src="_images/words-clustering_22_0.png" />
+<img alt="_images/words-clustering_21_0.png" src="_images/words-clustering_21_0.png" />
 </div>
 </div>
 </div>
@@ -816,7 +811,7 @@ const thebe_selector_output = ".output, .cell_output"
 <div class="cell_output docutils container">
 <div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
 <span class="ne">ValueError</span><span class="g g-Whitespace">                                </span>Traceback (most recent call last)
-<span class="o">/</span><span class="n">var</span><span class="o">/</span><span class="n">folders</span><span class="o">/</span><span class="n">bl</span><span class="o">/</span><span class="mi">2</span><span class="n">tw1vrc12mv_hqpbdf1j3wkw0000gn</span><span class="o">/</span><span class="n">T</span><span class="o">/</span><span class="n">ipykernel_11723</span><span class="o">/</span><span class="mf">296773274.</span><span class="n">py</span> <span class="ow">in</span> <span class="o">&lt;</span><span class="n">module</span><span class="o">&gt;</span>
+<span class="o">/</span><span class="n">var</span><span class="o">/</span><span class="n">folders</span><span class="o">/</span><span class="n">bl</span><span class="o">/</span><span class="mi">2</span><span class="n">tw1vrc12mv_hqpbdf1j3wkw0000gn</span><span class="o">/</span><span class="n">T</span><span class="o">/</span><span class="n">ipykernel_16072</span><span class="o">/</span><span class="mf">296773274.</span><span class="n">py</span> <span class="ow">in</span> <span class="o">&lt;</span><span class="n">module</span><span class="o">&gt;</span>
 <span class="g g-Whitespace">     </span><span class="mi">68</span> <span class="n">Y_</span> <span class="o">=</span> <span class="n">clf</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_scaled</span><span class="p">)</span>
 <span class="g g-Whitespace">     </span><span class="mi">69</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">mean</span><span class="p">,</span> <span class="n">cov</span><span class="p">,</span> <span class="n">color</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">clf</span><span class="o">.</span><span class="n">means_</span><span class="p">,</span> <span class="n">clf</span><span class="o">.</span><span class="n">covariances_</span><span class="p">,</span> <span class="n">color_iter</span><span class="p">)):</span>
 <span class="ne">---&gt; </span><span class="mi">70</span>     <span class="n">v</span><span class="p">,</span> <span class="n">w</span> <span class="o">=</span> <span class="n">linalg</span><span class="o">.</span><span class="n">eigh</span><span class="p">(</span><span class="n">cov</span><span class="p">)</span>
@@ -833,7 +828,7 @@ const thebe_selector_output = ".output, .cell_output"
 <span class="ne">ValueError</span>: expected square &quot;a&quot; matrix
 </pre></div>
 </div>
-<img alt="_images/words-clustering_24_1.png" src="_images/words-clustering_24_1.png" />
+<img alt="_images/words-clustering_23_1.png" src="_images/words-clustering_23_1.png" />
 </div>
 </div>
 </div>
@@ -868,15 +863,6 @@ const thebe_selector_output = ".output, .cell_output"
 
 <div class='prev-next-bottom'>
     
-    <div id="prev">
-        <a class="left-prev" href="intro.html" title="previous page">
-            <i class="prevnext-label fas fa-angle-left"></i>
-            <div class="prevnext-info">
-                <p class="prevnext-label">previous</p>
-                <p class="prevnext-title">Intro</p>
-            </div>
-        </a>
-    </div>
 
 </div>
         

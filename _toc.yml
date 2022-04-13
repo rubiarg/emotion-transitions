@@ -4,5 +4,5 @@
 format: jb-book
 root: intro
 chapters:
-- file: feeltrace-clustering
-- file: words-clustering
+- file: feeltrace
+- file: calibrated-words
