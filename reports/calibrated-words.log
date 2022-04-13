@@ -54,7 +54,7 @@ model_fitted.summary()
 
 [0;31m---------------------------------------------------------------------------[0m
 [0;31mValueError[0m                                Traceback (most recent call last)
-[0;32m/var/folders/bl/2tw1vrc12mv_hqpbdf1j3wkw0000gn/T/ipykernel_16019/142197828.py[0m in [0;36m<module>[0;34m[0m
+[0;32m/var/folders/bl/2tw1vrc12mv_hqpbdf1j3wkw0000gn/T/ipykernel_16635/142197828.py[0m in [0;36m<module>[0;34m[0m
 [1;32m      6[0m [0;31m# of VAR model and pick the order that gives a model with least AIC.[0m[0;34m[0m[0;34m[0m[0;34m[0m[0m
 [1;32m      7[0m [0;34m[0m[0m
 [0;32m----> 8[0;31m [0mmodel[0m [0;34m=[0m [0mVAR[0m[0;34m([0m[0mdf_differenced[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
