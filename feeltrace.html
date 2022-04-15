@@ -53,7 +53,7 @@ const thebe_selector_output = ".output, .cell_output"
     <script async="async" src="_static/sphinx-thebe.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Continuous self-report analysis" href="calibrated-words.html" />
+    <link rel="next" title="Calibrated words self-report analysis" href="calibrated-words.html" />
     <link rel="prev" title="Intro" href="intro.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="en" />
@@ -103,7 +103,12 @@ const thebe_selector_output = ".output, .cell_output"
  </li>
  <li class="toctree-l1">
   <a class="reference internal" href="calibrated-words.html">
-   Continuous self-report analysis
+   Calibrated words self-report analysis
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="words-feeltrace.html">
+   Feeltrace and calibrated words analysis
   </a>
  </li>
 </ul>
@@ -256,13 +261,6 @@ const thebe_selector_output = ".output, .cell_output"
     <a class="reference internal nav-link" href="#var-model">
      VAR Model
     </a>
-    <ul class="nav section-nav flex-column">
-     <li class="toc-h4 nav-item toc-entry">
-      <a class="reference internal nav-link" href="#gaussian-mixture-model">
-       Gaussian Mixture Model
-      </a>
-     </li>
-    </ul>
    </li>
    <li class="toc-h3 nav-item toc-entry">
     <a class="reference internal nav-link" href="#emotion-dynamics">
@@ -295,7 +293,7 @@ const thebe_selector_output = ".output, .cell_output"
       </a>
      </li>
      <li class="toc-h4 nav-item toc-entry">
-      <a class="reference internal nav-link" href="#id1">
+      <a class="reference internal nav-link" href="#gaussian-mixture-model">
        Gaussian Mixture Model
       </a>
      </li>
@@ -700,529 +698,6 @@ X-axis: lag index (0 to 1 min, Fs = 30Hz)</p>
 </table>
 </div></div></div>
 </div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">statsmodels.tsa.api</span> <span class="kn">import</span> <span class="n">VAR</span>
-<span class="kn">from</span> <span class="nn">statsmodels.tsa.stattools</span> <span class="kn">import</span> <span class="n">adfuller</span>
-<span class="kn">from</span> <span class="nn">statsmodels.tools.eval_measures</span> <span class="kn">import</span> <span class="n">rmse</span><span class="p">,</span> <span class="n">aic</span>
-
-<span class="c1">#------------------------------------------</span>
-<span class="c1"># granger causality tests</span>
-<span class="c1">#-----------------------------------------</span>
-
-
-<span class="c1"># The basis behind Vector AutoRegression is that each of the time series in the </span>
-<span class="c1"># system influences each other. That is, you can predict the series with past </span>
-<span class="c1"># values of itself along with other series in the system.</span>
-
-<span class="c1"># Using Granger’s Causality Test, it’s possible to test this relationship before </span>
-<span class="c1"># even building the model.</span>
-
-<span class="c1"># Ho: past values of time series (X) DO NOT cause the other series (Y).</span>
-
-
-<span class="kn">from</span> <span class="nn">statsmodels.tsa.stattools</span> <span class="kn">import</span> <span class="n">grangercausalitytests</span>
-<span class="n">maxlag</span><span class="o">=</span><span class="mi">12</span>
-<span class="n">test</span> <span class="o">=</span> <span class="s1">&#39;ssr_chi2test&#39;</span>
-
-<span class="k">def</span> <span class="nf">grangers_causation_matrix</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">variables</span><span class="p">,</span> <span class="n">test</span><span class="o">=</span><span class="s1">&#39;ssr_chi2test&#39;</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>    
-    <span class="sd">&quot;&quot;&quot;Check Granger Causality of all possible combinations of the Time series.</span>
-<span class="sd">    The rows are the response variable, columns are predictors. The values in the table </span>
-<span class="sd">    are the P-Values. P-Values lesser than the significance level (0.05), implies </span>
-<span class="sd">    the Null Hypothesis that the coefficients of the corresponding past values is </span>
-<span class="sd">    zero, that is, the X does not cause Y can be rejected.</span>
-
-<span class="sd">    data      : pandas dataframe containing the time series variables</span>
-<span class="sd">    variables : list containing names of the time series variables.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">variables</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">variables</span><span class="p">))),</span> <span class="n">columns</span><span class="o">=</span><span class="n">variables</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">variables</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
-        <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">:</span>
-            <span class="n">test_result</span> <span class="o">=</span> <span class="n">grangercausalitytests</span><span class="p">(</span><span class="n">data</span><span class="p">[[</span><span class="n">r</span><span class="p">,</span> <span class="n">c</span><span class="p">]],</span> <span class="n">maxlag</span><span class="o">=</span><span class="n">maxlag</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-            <span class="n">p_values</span> <span class="o">=</span> <span class="p">[</span><span class="nb">round</span><span class="p">(</span><span class="n">test_result</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="n">test</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span><span class="mi">4</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">maxlag</span><span class="p">)]</span>
-            <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Y = </span><span class="si">{</span><span class="n">r</span><span class="si">}</span><span class="s1">, X = </span><span class="si">{</span><span class="n">c</span><span class="si">}</span><span class="s1">, P Values = </span><span class="si">{</span><span class="n">p_values</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
-            <span class="n">min_p_value</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">p_values</span><span class="p">)</span>
-            <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">r</span><span class="p">,</span> <span class="n">c</span><span class="p">]</span> <span class="o">=</span> <span class="n">min_p_value</span>
-    <span class="n">df</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="n">var</span> <span class="o">+</span> <span class="s1">&#39;_x&#39;</span> <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">variables</span><span class="p">]</span>
-    <span class="n">df</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="p">[</span><span class="n">var</span> <span class="o">+</span> <span class="s1">&#39;_y&#39;</span> <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">variables</span><span class="p">]</span>
-    <span class="k">return</span> <span class="n">df</span>
-
-<span class="n">grangers_causation_matrix</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">variables</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> 
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/Users/rubiarg/.virtualenvs/cpsc554x/lib/python3.9/site-packages/statsmodels/base/model.py:1871: ValueWarning: covariance of constraints does not have full rank. The number of constraints is 2, but rank is 1
-  warnings.warn(&#39;covariance of constraints does not have full &#39;
-/Users/rubiarg/.virtualenvs/cpsc554x/lib/python3.9/site-packages/statsmodels/base/model.py:1871: ValueWarning: covariance of constraints does not have full rank. The number of constraints is 3, but rank is 1
-  warnings.warn(&#39;covariance of constraints does not have full &#39;
-/Users/rubiarg/.virtualenvs/cpsc554x/lib/python3.9/site-packages/statsmodels/base/model.py:1871: ValueWarning: covariance of constraints does not have full rank. The number of constraints is 4, but rank is 1
-  warnings.warn(&#39;covariance of constraints does not have full &#39;
-/Users/rubiarg/.virtualenvs/cpsc554x/lib/python3.9/site-packages/statsmodels/base/model.py:1871: ValueWarning: covariance of constraints does not have full rank. The number of constraints is 6, but rank is 1
-  warnings.warn(&#39;covariance of constraints does not have full &#39;
-/Users/rubiarg/.virtualenvs/cpsc554x/lib/python3.9/site-packages/statsmodels/base/model.py:1871: ValueWarning: covariance of constraints does not have full rank. The number of constraints is 7, but rank is 1
-  warnings.warn(&#39;covariance of constraints does not have full &#39;
-/Users/rubiarg/.virtualenvs/cpsc554x/lib/python3.9/site-packages/statsmodels/base/model.py:1871: ValueWarning: covariance of constraints does not have full rank. The number of constraints is 8, but rank is 1
-  warnings.warn(&#39;covariance of constraints does not have full &#39;
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/Users/rubiarg/.virtualenvs/cpsc554x/lib/python3.9/site-packages/statsmodels/base/model.py:1871: ValueWarning: covariance of constraints does not have full rank. The number of constraints is 10, but rank is 1
-  warnings.warn(&#39;covariance of constraints does not have full &#39;
-/Users/rubiarg/.virtualenvs/cpsc554x/lib/python3.9/site-packages/statsmodels/base/model.py:1871: ValueWarning: covariance of constraints does not have full rank. The number of constraints is 12, but rank is 1
-  warnings.warn(&#39;covariance of constraints does not have full &#39;
-</pre></div>
-</div>
-<div class="output text_html"><div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>Feeltrace_x</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>Feeltrace_y</th>
-      <td>1.0</td>
-    </tr>
-  </tbody>
-</table>
-</div></div></div>
-</div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># notes: </span>
-<span class="c1"># The row are the Response (Y) and the columns are the predictor series (X).</span>
-
-<span class="c1"># For example, if you take the value 0.0003 in (row 1, column 2), it refers to </span>
-<span class="c1"># the p-value of pgnp_x causing rgnp_y. Whereas, the 0.000 in (row 2, column 1) </span>
-<span class="c1"># refers to the p-value of rgnp_y causing pgnp_x.</span>
-
-
-<span class="c1">#-----------------------------------------</span>
-<span class="c1"># cointegration</span>
-<span class="c1">#-----------------------------------------</span>
-
-<span class="c1"># When two or more time series are cointegrated, it means they have a long run, </span>
-<span class="c1"># statistically significant relationship.</span>
-
-<span class="c1"># This is the basic premise on which Vector Autoregression(VAR) models is based on. </span>
-<span class="c1"># So, it’s fairly common to implement the cointegration test before starting to </span>
-<span class="c1"># build VAR models.</span>
-
-<span class="c1"># more technically:</span>
-<span class="c1"># Order of integration(d) is nothing but the number of differencing required to </span>
-<span class="c1"># make a non-stationary time series stationary.</span>
-
-<span class="c1"># Now, when you have two or more time series, and there exists a linear combination</span>
-<span class="c1">#  of them that has an order of integration (d) less than that of the individual </span>
-<span class="c1"># series, then the collection of series is said to be cointegrated.</span>
-
-<span class="kn">from</span> <span class="nn">statsmodels.tsa.vector_ar.vecm</span> <span class="kn">import</span> <span class="n">coint_johansen</span>
-
-<span class="k">def</span> <span class="nf">cointegration_test</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.05</span><span class="p">):</span> 
-    <span class="sd">&quot;&quot;&quot;Perform Johanson&#39;s Cointegration Test and Report Summary&quot;&quot;&quot;</span>
-    <span class="n">out</span> <span class="o">=</span> <span class="n">coint_johansen</span><span class="p">(</span><span class="n">df</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">5</span><span class="p">)</span>
-    <span class="n">d</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;0.90&#39;</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;0.95&#39;</span><span class="p">:</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;0.99&#39;</span><span class="p">:</span><span class="mi">2</span><span class="p">}</span>
-    <span class="n">traces</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">lr1</span>
-    <span class="n">cvts</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">cvt</span><span class="p">[:,</span> <span class="n">d</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">alpha</span><span class="p">)]]</span>
-    <span class="k">def</span> <span class="nf">adjust</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span> <span class="mi">6</span><span class="p">):</span> <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">val</span><span class="p">)</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="n">length</span><span class="p">)</span>
-
-    <span class="c1"># Summary</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Name   ::  Test Stat &gt; C(95%)    =&gt;   Signif  </span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;--&#39;</span><span class="o">*</span><span class="mi">20</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">col</span><span class="p">,</span> <span class="n">trace</span><span class="p">,</span> <span class="n">cvt</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span> <span class="n">traces</span><span class="p">,</span> <span class="n">cvts</span><span class="p">):</span>
-        <span class="nb">print</span><span class="p">(</span><span class="n">adjust</span><span class="p">(</span><span class="n">col</span><span class="p">),</span> <span class="s1">&#39;:: &#39;</span><span class="p">,</span> <span class="n">adjust</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">trace</span><span class="p">,</span><span class="mi">2</span><span class="p">),</span> <span class="mi">9</span><span class="p">),</span> <span class="s2">&quot;&gt;&quot;</span><span class="p">,</span> <span class="n">adjust</span><span class="p">(</span><span class="n">cvt</span><span class="p">,</span> <span class="mi">8</span><span class="p">),</span> <span class="s1">&#39; =&gt;  &#39;</span> <span class="p">,</span> <span class="n">trace</span> <span class="o">&gt;</span> <span class="n">cvt</span><span class="p">)</span>
-
-<span class="n">cointegration_test</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Name   ::  Test Stat &gt; C(95%)    =&gt;   Signif  
- ----------------------------------------
-Feeltrace ::  2.9       &gt; 4.1296    =&gt;   False
-</pre></div>
-</div>
-</div>
-</div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#---------------------------------------</span>
-<span class="c1"># training and validation data</span>
-<span class="c1">#--------------------------------------</span>
-
-<span class="c1"># The VAR model will be fitted on df_train and then used to forecast the next 4 </span>
-<span class="c1"># observations. These forecasts will be compared against the actuals present in </span>
-<span class="c1"># test data.</span>
-
-
-<span class="n">nobs</span> <span class="o">=</span> <span class="mi">4</span>
-<span class="n">df_train</span><span class="p">,</span> <span class="n">df_test</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="o">-</span><span class="n">nobs</span><span class="p">],</span> <span class="n">df</span><span class="p">[</span><span class="o">-</span><span class="n">nobs</span><span class="p">:]</span>
-
-<span class="c1"># Check size</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">df_train</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>  <span class="c1"># (119, 8)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">df_test</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>  <span class="c1"># (4, 8)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(18613, 1)
-(4, 1)
-</pre></div>
-</div>
-</div>
-</div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#------------------------------</span>
-<span class="c1"># check for stationarity</span>
-<span class="c1">#-----------------------------</span>
-
-<span class="c1"># VAR model requires the time series you want to forecast to be stationary, </span>
-<span class="c1"># it is customary to check all the time series in the system for stationarity.</span>
-
-<span class="c1"># Since, differencing reduces the length of the series by 1 and since all the </span>
-<span class="c1"># time series has to be of the same length, you need to difference all the series</span>
-<span class="c1">#  in the system if you choose to difference at all.</span>
-
-<span class="k">def</span> <span class="nf">adfuller_test</span><span class="p">(</span><span class="n">series</span><span class="p">,</span> <span class="n">signif</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Perform ADFuller to test for Stationarity of given series and print report&quot;&quot;&quot;</span>
-    <span class="n">r</span> <span class="o">=</span> <span class="n">adfuller</span><span class="p">(</span><span class="n">series</span><span class="p">,</span> <span class="n">autolag</span><span class="o">=</span><span class="s1">&#39;AIC&#39;</span><span class="p">)</span>
-    <span class="n">output</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;test_statistic&#39;</span><span class="p">:</span><span class="nb">round</span><span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">4</span><span class="p">),</span> <span class="s1">&#39;pvalue&#39;</span><span class="p">:</span><span class="nb">round</span><span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">4</span><span class="p">),</span> <span class="s1">&#39;n_lags&#39;</span><span class="p">:</span><span class="nb">round</span><span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="mi">4</span><span class="p">),</span> <span class="s1">&#39;n_obs&#39;</span><span class="p">:</span><span class="n">r</span><span class="p">[</span><span class="mi">3</span><span class="p">]}</span>
-    <span class="n">p_value</span> <span class="o">=</span> <span class="n">output</span><span class="p">[</span><span class="s1">&#39;pvalue&#39;</span><span class="p">]</span> 
-    <span class="k">def</span> <span class="nf">adjust</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span> <span class="mi">6</span><span class="p">):</span> <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">val</span><span class="p">)</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="n">length</span><span class="p">)</span>
-
-    <span class="c1"># Print Summary</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;    Augmented Dickey-Fuller Test on &quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1">&quot;&#39;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">   &quot;</span><span class="p">,</span> <span class="s1">&#39;-&#39;</span><span class="o">*</span><span class="mi">47</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39; Null Hypothesis: Data has unit root. Non-Stationary.&#39;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39; Significance Level    = </span><span class="si">{</span><span class="n">signif</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39; Test Statistic        = </span><span class="si">{</span><span class="n">output</span><span class="p">[</span><span class="s2">&quot;test_statistic&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39; No. Lags Chosen       = </span><span class="si">{</span><span class="n">output</span><span class="p">[</span><span class="s2">&quot;n_lags&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
-
-    <span class="k">for</span> <span class="n">key</span><span class="p">,</span><span class="n">val</span> <span class="ow">in</span> <span class="n">r</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39; Critical value </span><span class="si">{</span><span class="n">adjust</span><span class="p">(</span><span class="n">key</span><span class="p">)</span><span class="si">}</span><span class="s1"> = </span><span class="si">{</span><span class="nb">round</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
-
-    <span class="k">if</span> <span class="n">p_value</span> <span class="o">&lt;=</span> <span class="n">signif</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot; =&gt; P-Value = </span><span class="si">{</span><span class="n">p_value</span><span class="si">}</span><span class="s2">. Rejecting Null Hypothesis.&quot;</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot; =&gt; Series is Stationary.&quot;</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot; =&gt; P-Value = </span><span class="si">{</span><span class="n">p_value</span><span class="si">}</span><span class="s2">. Weak evidence to reject the Null Hypothesis.&quot;</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot; =&gt; Series is Non-Stationary.&quot;</span><span class="p">)</span>  
-        
- <span class="c1"># ADF Test on each column</span>
-<span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">column</span> <span class="ow">in</span> <span class="n">df_train</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
-    <span class="n">adfuller_test</span><span class="p">(</span><span class="n">column</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">column</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>       
-
-<span class="c1"># The ADF test confirms none of the time series is stationary. Let’s difference all </span>
-<span class="c1"># of them once and check again.</span>
-
-<span class="c1"># 1st difference</span>
-<span class="n">df_differenced</span> <span class="o">=</span> <span class="n">df_train</span><span class="o">.</span><span class="n">diff</span><span class="p">()</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
-
-<span class="c1"># ADF Test on each column of 1st Differences Dataframe</span>
-<span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">column</span> <span class="ow">in</span> <span class="n">df_differenced</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
-    <span class="n">adfuller_test</span><span class="p">(</span><span class="n">column</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">column</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
-    
-    
-<span class="c1"># After the first difference, Real Wages (Manufacturing) is still not stationary. </span>
-<span class="c1"># It’s critical value is between 5% and 10% significance level. All of the series </span>
-<span class="c1"># in the VAR model should have the same number of observations. So, we are left with </span>
-<span class="c1"># one of two choices. That is, either proceed with 1st differenced series or </span>
-<span class="c1"># difference all the series one more time.</span>
-
-<span class="c1"># Second Differencing</span>
-<span class="n">df_differenced</span> <span class="o">=</span> <span class="n">df_differenced</span><span class="o">.</span><span class="n">diff</span><span class="p">()</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
-
-<span class="c1"># ADF Test on each column of 2nd Differences Dataframe</span>
-<span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">column</span> <span class="ow">in</span> <span class="n">df_differenced</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
-    <span class="n">adfuller_test</span><span class="p">(</span><span class="n">column</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">column</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>    Augmented Dickey-Fuller Test on &quot;Feeltrace&quot; 
-    -----------------------------------------------
- Null Hypothesis: Data has unit root. Non-Stationary.
- Significance Level    = 0.05
- Test Statistic        = -4.8036
- No. Lags Chosen       = 39
- Critical value 1%     = -3.431
- Critical value 5%     = -2.862
- Critical value 10%    = -2.567
- =&gt; P-Value = 0.0001. Rejecting Null Hypothesis.
- =&gt; Series is Stationary.
-</pre></div>
-</div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>    Augmented Dickey-Fuller Test on &quot;Feeltrace&quot; 
-    -----------------------------------------------
- Null Hypothesis: Data has unit root. Non-Stationary.
- Significance Level    = 0.05
- Test Statistic        = -16.7814
- No. Lags Chosen       = 38
- Critical value 1%     = -3.431
- Critical value 5%     = -2.862
- Critical value 10%    = -2.567
- =&gt; P-Value = 0.0. Rejecting Null Hypothesis.
- =&gt; Series is Stationary.
-</pre></div>
-</div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>    Augmented Dickey-Fuller Test on &quot;Feeltrace&quot; 
-    -----------------------------------------------
- Null Hypothesis: Data has unit root. Non-Stationary.
- Significance Level    = 0.05
- Test Statistic        = -29.1734
- No. Lags Chosen       = 45
- Critical value 1%     = -3.431
- Critical value 5%     = -2.862
- Critical value 10%    = -2.567
- =&gt; P-Value = 0.0. Rejecting Null Hypothesis.
- =&gt; Series is Stationary.
-</pre></div>
-</div>
-</div>
-</div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#---------------------------------------</span>
-<span class="c1"># fitting the order of the VAR</span>
-<span class="c1">#--------------------------------------</span>
-
-<span class="c1"># To select the right order of the VAR model, we iteratively fit increasing orders </span>
-<span class="c1"># of VAR model and pick the order that gives a model with least AIC.</span>
-
-<span class="n">model</span> <span class="o">=</span> <span class="n">VAR</span><span class="p">(</span><span class="n">df_differenced</span><span class="p">)</span>
-<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">6</span><span class="p">,</span><span class="mi">7</span><span class="p">,</span><span class="mi">8</span><span class="p">,</span><span class="mi">9</span><span class="p">]:</span>
-    <span class="n">result</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Lag Order =&#39;</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;AIC : &#39;</span><span class="p">,</span> <span class="n">result</span><span class="o">.</span><span class="n">aic</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;BIC : &#39;</span><span class="p">,</span> <span class="n">result</span><span class="o">.</span><span class="n">bic</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;FPE : &#39;</span><span class="p">,</span> <span class="n">result</span><span class="o">.</span><span class="n">fpe</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;HQIC: &#39;</span><span class="p">,</span> <span class="n">result</span><span class="o">.</span><span class="n">hqic</span><span class="p">,</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
-    
-<span class="c1"># In the above output, the AIC drops to lowest at lag 4, then increases at </span>
-<span class="c1"># lag 5 and then continuously drops further. (more negative = &#39;smaller&#39; AIC)</span>
-
-<span class="c1">#---------------------------------</span>
-<span class="c1"># alterntative: auto fit</span>
-<span class="c1">#---------------------------------</span>
-
-<span class="n">x</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">select_order</span><span class="p">(</span><span class="n">maxlags</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
-<span class="n">x</span><span class="o">.</span><span class="n">summary</span><span class="p">()</span>
-
-
-<span class="c1">#----------------------------------</span>
-<span class="c1"># fit VAR(4)</span>
-<span class="c1">#---------------------------------</span>
-
-<span class="n">model_fitted</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
-<span class="n">model_fitted</span><span class="o">.</span><span class="n">summary</span><span class="p">()</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/Users/rubiarg/.virtualenvs/cpsc554x/lib/python3.9/site-packages/statsmodels/tsa/base/tsa_model.py:471: ValueWarning: An unsupported index was provided and will be ignored when e.g. forecasting.
-  self._init_dates(dates, freq)
-</pre></div>
-</div>
-<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
-<span class="ne">ValueError</span><span class="g g-Whitespace">                                </span>Traceback (most recent call last)
-<span class="o">/</span><span class="n">var</span><span class="o">/</span><span class="n">folders</span><span class="o">/</span><span class="n">bl</span><span class="o">/</span><span class="mi">2</span><span class="n">tw1vrc12mv_hqpbdf1j3wkw0000gn</span><span class="o">/</span><span class="n">T</span><span class="o">/</span><span class="n">ipykernel_16046</span><span class="o">/</span><span class="mf">142197828.</span><span class="n">py</span> <span class="ow">in</span> <span class="o">&lt;</span><span class="n">module</span><span class="o">&gt;</span>
-<span class="g g-Whitespace">      </span><span class="mi">6</span> <span class="c1"># of VAR model and pick the order that gives a model with least AIC.</span>
-<span class="g g-Whitespace">      </span><span class="mi">7</span> 
-<span class="ne">----&gt; </span><span class="mi">8</span> <span class="n">model</span> <span class="o">=</span> <span class="n">VAR</span><span class="p">(</span><span class="n">df_differenced</span><span class="p">)</span>
-<span class="g g-Whitespace">      </span><span class="mi">9</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">6</span><span class="p">,</span><span class="mi">7</span><span class="p">,</span><span class="mi">8</span><span class="p">,</span><span class="mi">9</span><span class="p">]:</span>
-<span class="g g-Whitespace">     </span><span class="mi">10</span>     <span class="n">result</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
-
-<span class="nn">~/.virtualenvs/cpsc554x/lib/python3.9/site-packages/statsmodels/tsa/vector_ar/var_model.py</span> in <span class="ni">__init__</span><span class="nt">(self, endog, exog, dates, freq, missing)</span>
-<span class="g g-Whitespace">    </span><span class="mi">551</span>         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">endog</span><span class="p">,</span> <span class="n">exog</span><span class="p">,</span> <span class="n">dates</span><span class="p">,</span> <span class="n">freq</span><span class="p">,</span> <span class="n">missing</span><span class="o">=</span><span class="n">missing</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">552</span>         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">endog</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-<span class="ne">--&gt; </span><span class="mi">553</span>             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Only gave one variable to VAR&quot;</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">554</span>         <span class="bp">self</span><span class="o">.</span><span class="n">neqs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">endog</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-<span class="g g-Whitespace">    </span><span class="mi">555</span>         <span class="bp">self</span><span class="o">.</span><span class="n">n_totobs</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">endog</span><span class="p">)</span>
-
-<span class="ne">ValueError</span>: Only gave one variable to VAR
-</pre></div>
-</div>
-</div>
-</div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#---------------------------------------</span>
-<span class="c1"># check for remaining serial correlation</span>
-<span class="c1">#---------------------------------------</span>
-
-
-<span class="c1"># Serial correlation of residuals is used to check if there is any leftover pattern </span>
-<span class="c1"># in the residuals (errors). If there is any correlation left in the residuals, then,</span>
-<span class="c1"># there is some pattern in the time series that is still left to be explained by the</span>
-<span class="c1"># model. In that case, the typical course of action is to either increase the order</span>
-<span class="c1"># of the model or induce more predictors into the system or look for a different </span>
-<span class="c1"># algorithm to model the time series.</span>
-
-<span class="c1"># A common way of checking for serial correlation of errors can be measured using </span>
-<span class="c1"># the Durbin Watson’s Statistic.</span>
-
-<span class="c1"># The value of this statistic can vary between 0 and 4. The closer it is to the value </span>
-<span class="c1"># 2, then there is no significant serial correlation. The closer to 0, there is a </span>
-<span class="c1"># positive serial correlation, and the closer it is to 4 implies negative serial </span>
-<span class="c1"># correlation.</span>
-
-<span class="kn">from</span> <span class="nn">statsmodels.stats.stattools</span> <span class="kn">import</span> <span class="n">durbin_watson</span>
-<span class="n">out</span> <span class="o">=</span> <span class="n">durbin_watson</span><span class="p">(</span><span class="n">model_fitted</span><span class="o">.</span><span class="n">resid</span><span class="p">)</span>
-
-<span class="c1"># for col, val in zip(df.columns, out):</span>
-<span class="c1">#    print(adjust(col), &#39;:&#39;, round(val, 2))</span>
-    
-<span class="k">for</span> <span class="n">col</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span> <span class="n">out</span><span class="p">):</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">col</span><span class="p">,</span> <span class="s1">&#39;:&#39;</span><span class="p">,</span> <span class="nb">round</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
-    
-<span class="c1">#--------------------------------------</span>
-<span class="c1"># forecasting</span>
-<span class="c1">#--------------------------------------</span>
-
-<span class="c1"># In order to forecast, the VAR model expects up to the lag order number of </span>
-<span class="c1"># observations from the past data. This is because, the terms in the VAR model </span>
-<span class="c1"># are essentially the lags of the various time series in the dataset, so you </span>
-<span class="c1"># need to provide it as many of the previous values as indicated by the lag order</span>
-<span class="c1"># used by the model.</span>
-
-<span class="c1"># Get the lag order (we already know this)</span>
-<span class="n">lag_order</span> <span class="o">=</span> <span class="n">model_fitted</span><span class="o">.</span><span class="n">k_ar</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">lag_order</span><span class="p">)</span>  <span class="c1">#&gt; 4</span>
-
-<span class="c1"># Input data for forecasting</span>
-<span class="n">forecast_input</span> <span class="o">=</span> <span class="n">df_differenced</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="o">-</span><span class="n">lag_order</span><span class="p">:]</span>
-<span class="n">forecast_input</span>
-
-<span class="c1"># Forecast</span>
-<span class="n">fc</span> <span class="o">=</span> <span class="n">model_fitted</span><span class="o">.</span><span class="n">forecast</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="n">forecast_input</span><span class="p">,</span> <span class="n">steps</span><span class="o">=</span><span class="n">nobs</span><span class="p">)</span> <span class="c1"># nobs defined at top of program</span>
-<span class="n">df_forecast</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">fc</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="o">-</span><span class="n">nobs</span><span class="p">:],</span> <span class="n">columns</span><span class="o">=</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span> <span class="o">+</span> <span class="s1">&#39;_2d&#39;</span><span class="p">)</span>
-<span class="n">df_forecast</span>
-
-
-<span class="c1"># The forecasts are generated but it is on the scale of the training data used by </span>
-<span class="c1"># the model. So, to bring it back up to its original scale, you need to de-difference </span>
-<span class="c1"># it as many times you had differenced the original input data.</span>
-
-<span class="k">def</span> <span class="nf">invert_transformation</span><span class="p">(</span><span class="n">df_train</span><span class="p">,</span> <span class="n">df_forecast</span><span class="p">,</span> <span class="n">second_diff</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Revert back the differencing to get the forecast to original scale.&quot;&quot;&quot;</span>
-    <span class="n">df_fc</span> <span class="o">=</span> <span class="n">df_forecast</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-    <span class="n">columns</span> <span class="o">=</span> <span class="n">df_train</span><span class="o">.</span><span class="n">columns</span>
-    <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">columns</span><span class="p">:</span>        
-        <span class="c1"># Roll back 2nd Diff</span>
-        <span class="k">if</span> <span class="n">second_diff</span><span class="p">:</span>
-            <span class="n">df_fc</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">col</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;_1d&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">df_train</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">df_train</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">])</span> <span class="o">+</span> <span class="n">df_fc</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">col</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;_2d&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">cumsum</span><span class="p">()</span>
-        <span class="c1"># Roll back 1st Diff</span>
-        <span class="n">df_fc</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">col</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;_forecast&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df_train</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">df_fc</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">col</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;_1d&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">cumsum</span><span class="p">()</span>
-    <span class="k">return</span> <span class="n">df_fc</span>
-
-
-<span class="n">df_results</span> <span class="o">=</span> <span class="n">invert_transformation</span><span class="p">(</span><span class="n">df_train</span><span class="p">,</span> <span class="n">df_forecast</span><span class="p">,</span> <span class="n">second_diff</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>        
-<span class="n">df_results</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="p">[</span><span class="s1">&#39;rgnp_forecast&#39;</span><span class="p">,</span> <span class="s1">&#39;pgnp_forecast&#39;</span><span class="p">,</span> <span class="s1">&#39;ulc_forecast&#39;</span><span class="p">,</span> <span class="s1">&#39;gdfco_forecast&#39;</span><span class="p">,</span>
-                   <span class="s1">&#39;gdf_forecast&#39;</span><span class="p">,</span> <span class="s1">&#39;gdfim_forecast&#39;</span><span class="p">,</span> <span class="s1">&#39;gdfcf_forecast&#39;</span><span class="p">,</span> <span class="s1">&#39;gdfce_forecast&#39;</span><span class="p">]]</span>
-
-
-<span class="c1">#---------------------------</span>
-<span class="c1"># plot forecasts</span>
-<span class="c1">#---------------------------</span>
-
-
-<span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">nrows</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span><span class="p">),</span> <span class="n">ncols</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">150</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">10</span><span class="p">))</span>
-<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">col</span><span class="p">,</span><span class="n">ax</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span> <span class="n">axes</span><span class="o">.</span><span class="n">flatten</span><span class="p">())):</span>
-    <span class="n">df_results</span><span class="p">[</span><span class="n">col</span><span class="o">+</span><span class="s1">&#39;_forecast&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span><span class="o">.</span><span class="n">autoscale</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;x&#39;</span><span class="p">,</span><span class="n">tight</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="n">df_test</span><span class="p">[</span><span class="n">col</span><span class="p">][</span><span class="o">-</span><span class="n">nobs</span><span class="p">:]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">);</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">col</span> <span class="o">+</span> <span class="s2">&quot;: Forecast vs Actuals&quot;</span><span class="p">)</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">set_ticks_position</span><span class="p">(</span><span class="s1">&#39;none&#39;</span><span class="p">)</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">set_ticks_position</span><span class="p">(</span><span class="s1">&#39;none&#39;</span><span class="p">)</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">spines</span><span class="p">[</span><span class="s2">&quot;top&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">set_alpha</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">labelsize</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span>
-
-<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">();</span>
-
-
-<span class="c1">#-----------------------------------------</span>
-<span class="c1"># forecast accuracy</span>
-<span class="c1">#-----------------------------------------</span>
-
-
-<span class="kn">from</span> <span class="nn">statsmodels.tsa.stattools</span> <span class="kn">import</span> <span class="n">acf</span>
-<span class="k">def</span> <span class="nf">forecast_accuracy</span><span class="p">(</span><span class="n">forecast</span><span class="p">,</span> <span class="n">actual</span><span class="p">):</span>
-    <span class="n">mape</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">forecast</span> <span class="o">-</span> <span class="n">actual</span><span class="p">)</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">actual</span><span class="p">))</span>  <span class="c1"># MAPE</span>
-    <span class="n">me</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">forecast</span> <span class="o">-</span> <span class="n">actual</span><span class="p">)</span>             <span class="c1"># ME</span>
-    <span class="n">mae</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">forecast</span> <span class="o">-</span> <span class="n">actual</span><span class="p">))</span>    <span class="c1"># MAE</span>
-    <span class="n">mpe</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">((</span><span class="n">forecast</span> <span class="o">-</span> <span class="n">actual</span><span class="p">)</span><span class="o">/</span><span class="n">actual</span><span class="p">)</span>   <span class="c1"># MPE</span>
-    <span class="n">rmse</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">((</span><span class="n">forecast</span> <span class="o">-</span> <span class="n">actual</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">**</span><span class="mf">.5</span>  <span class="c1"># RMSE</span>
-    <span class="n">corr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">corrcoef</span><span class="p">(</span><span class="n">forecast</span><span class="p">,</span> <span class="n">actual</span><span class="p">)[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span>   <span class="c1"># corr</span>
-    <span class="n">mins</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">amin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">([</span><span class="n">forecast</span><span class="p">[:,</span><span class="kc">None</span><span class="p">],</span> 
-                              <span class="n">actual</span><span class="p">[:,</span><span class="kc">None</span><span class="p">]]),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-    <span class="n">maxs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">amax</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">([</span><span class="n">forecast</span><span class="p">[:,</span><span class="kc">None</span><span class="p">],</span> 
-                              <span class="n">actual</span><span class="p">[:,</span><span class="kc">None</span><span class="p">]]),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-    <span class="n">minmax</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">mins</span><span class="o">/</span><span class="n">maxs</span><span class="p">)</span>             <span class="c1"># minmax</span>
-    <span class="k">return</span><span class="p">({</span><span class="s1">&#39;mape&#39;</span><span class="p">:</span><span class="n">mape</span><span class="p">,</span> <span class="s1">&#39;me&#39;</span><span class="p">:</span><span class="n">me</span><span class="p">,</span> <span class="s1">&#39;mae&#39;</span><span class="p">:</span> <span class="n">mae</span><span class="p">,</span> 
-            <span class="s1">&#39;mpe&#39;</span><span class="p">:</span> <span class="n">mpe</span><span class="p">,</span> <span class="s1">&#39;rmse&#39;</span><span class="p">:</span><span class="n">rmse</span><span class="p">,</span> <span class="s1">&#39;corr&#39;</span><span class="p">:</span><span class="n">corr</span><span class="p">,</span> <span class="s1">&#39;minmax&#39;</span><span class="p">:</span><span class="n">minmax</span><span class="p">})</span>
-
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Forecast Accuracy of: rgnp&#39;</span><span class="p">)</span>
-<span class="n">accuracy_prod</span> <span class="o">=</span> <span class="n">forecast_accuracy</span><span class="p">(</span><span class="n">df_results</span><span class="p">[</span><span class="s1">&#39;rgnp_forecast&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">df_test</span><span class="p">[</span><span class="s1">&#39;rgnp&#39;</span><span class="p">])</span>
-<span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">accuracy_prod</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="s1">&#39;: &#39;</span><span class="p">,</span> <span class="nb">round</span><span class="p">(</span><span class="n">v</span><span class="p">,</span><span class="mi">4</span><span class="p">))</span>
-
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Forecast Accuracy of: pgnp&#39;</span><span class="p">)</span>
-<span class="n">accuracy_prod</span> <span class="o">=</span> <span class="n">forecast_accuracy</span><span class="p">(</span><span class="n">df_results</span><span class="p">[</span><span class="s1">&#39;pgnp_forecast&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">df_test</span><span class="p">[</span><span class="s1">&#39;pgnp&#39;</span><span class="p">])</span>
-<span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">accuracy_prod</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="s1">&#39;: &#39;</span><span class="p">,</span> <span class="nb">round</span><span class="p">(</span><span class="n">v</span><span class="p">,</span><span class="mi">4</span><span class="p">))</span>
-
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Forecast Accuracy of: ulc&#39;</span><span class="p">)</span>
-<span class="n">accuracy_prod</span> <span class="o">=</span> <span class="n">forecast_accuracy</span><span class="p">(</span><span class="n">df_results</span><span class="p">[</span><span class="s1">&#39;ulc_forecast&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">df_test</span><span class="p">[</span><span class="s1">&#39;ulc&#39;</span><span class="p">])</span>
-<span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">accuracy_prod</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="s1">&#39;: &#39;</span><span class="p">,</span> <span class="nb">round</span><span class="p">(</span><span class="n">v</span><span class="p">,</span><span class="mi">4</span><span class="p">))</span>
-
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Forecast Accuracy of: gdfco&#39;</span><span class="p">)</span>
-<span class="n">accuracy_prod</span> <span class="o">=</span> <span class="n">forecast_accuracy</span><span class="p">(</span><span class="n">df_results</span><span class="p">[</span><span class="s1">&#39;gdfco_forecast&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">df_test</span><span class="p">[</span><span class="s1">&#39;gdfco&#39;</span><span class="p">])</span>
-<span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">accuracy_prod</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="s1">&#39;: &#39;</span><span class="p">,</span> <span class="nb">round</span><span class="p">(</span><span class="n">v</span><span class="p">,</span><span class="mi">4</span><span class="p">))</span>
-
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Forecast Accuracy of: gdf&#39;</span><span class="p">)</span>
-<span class="n">accuracy_prod</span> <span class="o">=</span> <span class="n">forecast_accuracy</span><span class="p">(</span><span class="n">df_results</span><span class="p">[</span><span class="s1">&#39;gdf_forecast&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">df_test</span><span class="p">[</span><span class="s1">&#39;gdf&#39;</span><span class="p">])</span>
-<span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">accuracy_prod</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="s1">&#39;: &#39;</span><span class="p">,</span> <span class="nb">round</span><span class="p">(</span><span class="n">v</span><span class="p">,</span><span class="mi">4</span><span class="p">))</span>
-
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Forecast Accuracy of: gdfim&#39;</span><span class="p">)</span>
-<span class="n">accuracy_prod</span> <span class="o">=</span> <span class="n">forecast_accuracy</span><span class="p">(</span><span class="n">df_results</span><span class="p">[</span><span class="s1">&#39;gdfim_forecast&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">df_test</span><span class="p">[</span><span class="s1">&#39;gdfim&#39;</span><span class="p">])</span>
-<span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">accuracy_prod</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="s1">&#39;: &#39;</span><span class="p">,</span> <span class="nb">round</span><span class="p">(</span><span class="n">v</span><span class="p">,</span><span class="mi">4</span><span class="p">))</span>
-
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Forecast Accuracy of: gdfcf&#39;</span><span class="p">)</span>
-<span class="n">accuracy_prod</span> <span class="o">=</span> <span class="n">forecast_accuracy</span><span class="p">(</span><span class="n">df_results</span><span class="p">[</span><span class="s1">&#39;gdfcf_forecast&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">df_test</span><span class="p">[</span><span class="s1">&#39;gdfcf&#39;</span><span class="p">])</span>
-<span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">accuracy_prod</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="s1">&#39;: &#39;</span><span class="p">,</span> <span class="nb">round</span><span class="p">(</span><span class="n">v</span><span class="p">,</span><span class="mi">4</span><span class="p">))</span>
-
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Forecast Accuracy of: gdfce&#39;</span><span class="p">)</span>
-<span class="n">accuracy_prod</span> <span class="o">=</span> <span class="n">forecast_accuracy</span><span class="p">(</span><span class="n">df_results</span><span class="p">[</span><span class="s1">&#39;gdfce_forecast&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">df_test</span><span class="p">[</span><span class="s1">&#39;gdfce&#39;</span><span class="p">])</span>
-<span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">accuracy_prod</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="s1">&#39;: &#39;</span><span class="p">,</span> <span class="nb">round</span><span class="p">(</span><span class="n">v</span><span class="p">,</span><span class="mi">4</span><span class="p">))</span>
-</pre></div>
-</div>
-</div>
-</div>
-<div class="section" id="gaussian-mixture-model">
-<h4>Gaussian Mixture Model<a class="headerlink" href="#gaussian-mixture-model" title="Permalink to this headline">¶</a></h4>
-</div>
 </div>
 <div class="section" id="emotion-dynamics">
 <h3>Emotion dynamics<a class="headerlink" href="#emotion-dynamics" title="Permalink to this headline">¶</a></h3>
@@ -1471,7 +946,7 @@ Feeltrace ::  2.9       &gt; 4.1296    =&gt;   False
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="_images/feeltrace_42_0.png" src="_images/feeltrace_42_0.png" />
+<img alt="_images/feeltrace_35_0.png" src="_images/feeltrace_35_0.png" />
 </div>
 </div>
 </div>
@@ -1507,9 +982,9 @@ Feeltrace ::  2.9       &gt; 4.1296    =&gt;   False
   <thead>
     <tr style="text-align: right;">
       <th></th>
+      <th>Inertia</th>
       <th>Instability</th>
       <th>Variability</th>
-      <th>Inertia</th>
     </tr>
   </thead>
   <tbody>
@@ -1582,7 +1057,7 @@ Feeltrace ::  2.9       &gt; 4.1296    =&gt;   False
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="_images/feeltrace_47_0.png" src="_images/feeltrace_47_0.png" />
+<img alt="_images/feeltrace_40_0.png" src="_images/feeltrace_40_0.png" />
 </div>
 </div>
 </div>
@@ -1607,12 +1082,12 @@ Feeltrace ::  2.9       &gt; 4.1296    =&gt;   False
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="_images/feeltrace_49_0.png" src="_images/feeltrace_49_0.png" />
+<img alt="_images/feeltrace_42_0.png" src="_images/feeltrace_42_0.png" />
 </div>
 </div>
 </div>
-<div class="section" id="id1">
-<h4>Gaussian Mixture Model<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h4>
+<div class="section" id="gaussian-mixture-model">
+<h4>Gaussian Mixture Model<a class="headerlink" href="#gaussian-mixture-model" title="Permalink to this headline">¶</a></h4>
 <ul class="simple">
 <li><p>Gaussian Mixture Models using information-theoretic criteria (BIC).</p></li>
 <li><p>Model selection concerns both the covariance type and the number of components in the model.</p></li>
@@ -1680,7 +1155,7 @@ Feeltrace ::  2.9       &gt; 4.1296    =&gt;   False
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="_images/feeltrace_53_0.png" src="_images/feeltrace_53_0.png" />
+<img alt="_images/feeltrace_46_0.png" src="_images/feeltrace_46_0.png" />
 </div>
 </div>
 <div class="cell docutils container">
@@ -1713,7 +1188,7 @@ Feeltrace ::  2.9       &gt; 4.1296    =&gt;   False
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="_images/feeltrace_54_0.png" src="_images/feeltrace_54_0.png" />
+<img alt="_images/feeltrace_47_0.png" src="_images/feeltrace_47_0.png" />
 </div>
 </div>
 </div>
@@ -1860,22 +1335,174 @@ Feeltrace ::  2.9       &gt; 4.1296    =&gt;   False
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="_images/feeltrace_62_0.png" src="_images/feeltrace_62_0.png" />
-<img alt="_images/feeltrace_62_1.png" src="_images/feeltrace_62_1.png" />
-<img alt="_images/feeltrace_62_2.png" src="_images/feeltrace_62_2.png" />
-<img alt="_images/feeltrace_62_3.png" src="_images/feeltrace_62_3.png" />
-<img alt="_images/feeltrace_62_4.png" src="_images/feeltrace_62_4.png" />
-<img alt="_images/feeltrace_62_5.png" src="_images/feeltrace_62_5.png" />
-<img alt="_images/feeltrace_62_6.png" src="_images/feeltrace_62_6.png" />
-<img alt="_images/feeltrace_62_7.png" src="_images/feeltrace_62_7.png" />
-<img alt="_images/feeltrace_62_8.png" src="_images/feeltrace_62_8.png" />
-<img alt="_images/feeltrace_62_9.png" src="_images/feeltrace_62_9.png" />
-<img alt="_images/feeltrace_62_10.png" src="_images/feeltrace_62_10.png" />
-<img alt="_images/feeltrace_62_11.png" src="_images/feeltrace_62_11.png" />
-<img alt="_images/feeltrace_62_12.png" src="_images/feeltrace_62_12.png" />
-<img alt="_images/feeltrace_62_13.png" src="_images/feeltrace_62_13.png" />
-<img alt="_images/feeltrace_62_14.png" src="_images/feeltrace_62_14.png" />
-<img alt="_images/feeltrace_62_15.png" src="_images/feeltrace_62_15.png" />
+<img alt="_images/feeltrace_55_0.png" src="_images/feeltrace_55_0.png" />
+<img alt="_images/feeltrace_55_1.png" src="_images/feeltrace_55_1.png" />
+<img alt="_images/feeltrace_55_2.png" src="_images/feeltrace_55_2.png" />
+<img alt="_images/feeltrace_55_3.png" src="_images/feeltrace_55_3.png" />
+<img alt="_images/feeltrace_55_4.png" src="_images/feeltrace_55_4.png" />
+<img alt="_images/feeltrace_55_5.png" src="_images/feeltrace_55_5.png" />
+<img alt="_images/feeltrace_55_6.png" src="_images/feeltrace_55_6.png" />
+<img alt="_images/feeltrace_55_7.png" src="_images/feeltrace_55_7.png" />
+<img alt="_images/feeltrace_55_8.png" src="_images/feeltrace_55_8.png" />
+<img alt="_images/feeltrace_55_9.png" src="_images/feeltrace_55_9.png" />
+<img alt="_images/feeltrace_55_10.png" src="_images/feeltrace_55_10.png" />
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Error in callback &lt;function flush_figures at 0x113b60160&gt; (for post_execute):
+</pre></div>
+</div>
+<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
+<span class="ne">KeyboardInterrupt</span><span class="g g-Whitespace">                         </span>Traceback (most recent call last)
+<span class="nn">~/.virtualenvs/cpsc554x/lib/python3.9/site-packages/matplotlib_inline/backend_inline.py</span> in <span class="ni">flush_figures</span><span class="nt">()</span>
+<span class="g g-Whitespace">    </span><span class="mi">119</span>         <span class="c1"># ignore the tracking, just draw and close all figures</span>
+<span class="g g-Whitespace">    </span><span class="mi">120</span>         <span class="k">try</span><span class="p">:</span>
+<span class="ne">--&gt; </span><span class="mi">121</span>             <span class="k">return</span> <span class="n">show</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">122</span>         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+<span class="g g-Whitespace">    </span><span class="mi">123</span>             <span class="c1"># safely show traceback if in IPython, else raise</span>
+
+<span class="nn">~/.virtualenvs/cpsc554x/lib/python3.9/site-packages/matplotlib_inline/backend_inline.py</span> in <span class="ni">show</span><span class="nt">(close, block)</span>
+<span class="g g-Whitespace">     </span><span class="mi">39</span>     <span class="k">try</span><span class="p">:</span>
+<span class="g g-Whitespace">     </span><span class="mi">40</span>         <span class="k">for</span> <span class="n">figure_manager</span> <span class="ow">in</span> <span class="n">Gcf</span><span class="o">.</span><span class="n">get_all_fig_managers</span><span class="p">():</span>
+<span class="ne">---&gt; </span><span class="mi">41</span>             <span class="n">display</span><span class="p">(</span>
+<span class="g g-Whitespace">     </span><span class="mi">42</span>                 <span class="n">figure_manager</span><span class="o">.</span><span class="n">canvas</span><span class="o">.</span><span class="n">figure</span><span class="p">,</span>
+<span class="g g-Whitespace">     </span><span class="mi">43</span>                 <span class="n">metadata</span><span class="o">=</span><span class="n">_fetch_figure_metadata</span><span class="p">(</span><span class="n">figure_manager</span><span class="o">.</span><span class="n">canvas</span><span class="o">.</span><span class="n">figure</span><span class="p">)</span>
+
+<span class="nn">~/.virtualenvs/cpsc554x/lib/python3.9/site-packages/IPython/core/display.py</span> in <span class="ni">display</span><span class="nt">(include, exclude, metadata, transient, display_id, *objs, **kwargs)</span>
+<span class="g g-Whitespace">    </span><span class="mi">318</span>             <span class="n">publish_display_data</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">obj</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="n">metadata</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">319</span>         <span class="k">else</span><span class="p">:</span>
+<span class="ne">--&gt; </span><span class="mi">320</span>             <span class="n">format_dict</span><span class="p">,</span> <span class="n">md_dict</span> <span class="o">=</span> <span class="nb">format</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">include</span><span class="o">=</span><span class="n">include</span><span class="p">,</span> <span class="n">exclude</span><span class="o">=</span><span class="n">exclude</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">321</span>             <span class="k">if</span> <span class="ow">not</span> <span class="n">format_dict</span><span class="p">:</span>
+<span class="g g-Whitespace">    </span><span class="mi">322</span>                 <span class="c1"># nothing to display (e.g. _ipython_display_ took over)</span>
+
+<span class="nn">~/.virtualenvs/cpsc554x/lib/python3.9/site-packages/IPython/core/formatters.py</span> in <span class="ni">format</span><span class="nt">(self, obj, include, exclude)</span>
+<span class="g g-Whitespace">    </span><span class="mi">178</span>             <span class="n">md</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="g g-Whitespace">    </span><span class="mi">179</span>             <span class="k">try</span><span class="p">:</span>
+<span class="ne">--&gt; </span><span class="mi">180</span>                 <span class="n">data</span> <span class="o">=</span> <span class="n">formatter</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">181</span>             <span class="k">except</span><span class="p">:</span>
+<span class="g g-Whitespace">    </span><span class="mi">182</span>                 <span class="c1"># FIXME: log the exception</span>
+
+<span class="nn">&lt;decorator-gen-2&gt;</span> in <span class="ni">__call__</span><span class="nt">(self, obj)</span>
+
+<span class="nn">~/.virtualenvs/cpsc554x/lib/python3.9/site-packages/IPython/core/formatters.py</span> in <span class="ni">catch_format_error</span><span class="nt">(method, self, *args, **kwargs)</span>
+<span class="g g-Whitespace">    </span><span class="mi">222</span>     <span class="sd">&quot;&quot;&quot;show traceback on failed format call&quot;&quot;&quot;</span>
+<span class="g g-Whitespace">    </span><span class="mi">223</span>     <span class="k">try</span><span class="p">:</span>
+<span class="ne">--&gt; </span><span class="mi">224</span>         <span class="n">r</span> <span class="o">=</span> <span class="n">method</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">225</span>     <span class="k">except</span> <span class="ne">NotImplementedError</span><span class="p">:</span>
+<span class="g g-Whitespace">    </span><span class="mi">226</span>         <span class="c1"># don&#39;t warn on NotImplementedErrors</span>
+
+<span class="nn">~/.virtualenvs/cpsc554x/lib/python3.9/site-packages/IPython/core/formatters.py</span> in <span class="ni">__call__</span><span class="nt">(self, obj)</span>
+<span class="g g-Whitespace">    </span><span class="mi">339</span>                 <span class="k">pass</span>
+<span class="g g-Whitespace">    </span><span class="mi">340</span>             <span class="k">else</span><span class="p">:</span>
+<span class="ne">--&gt; </span><span class="mi">341</span>                 <span class="k">return</span> <span class="n">printer</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">342</span>             <span class="c1"># Finally look for special method names</span>
+<span class="g g-Whitespace">    </span><span class="mi">343</span>             <span class="n">method</span> <span class="o">=</span> <span class="n">get_real_method</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">print_method</span><span class="p">)</span>
+
+<span class="nn">~/.virtualenvs/cpsc554x/lib/python3.9/site-packages/IPython/core/pylabtools.py</span> in <span class="ni">&lt;lambda&gt;</span><span class="nt">(fig)</span>
+<span class="g g-Whitespace">    </span><span class="mi">251</span> 
+<span class="g g-Whitespace">    </span><span class="mi">252</span>     <span class="k">if</span> <span class="s1">&#39;png&#39;</span> <span class="ow">in</span> <span class="n">formats</span><span class="p">:</span>
+<span class="ne">--&gt; </span><span class="mi">253</span>         <span class="n">png_formatter</span><span class="o">.</span><span class="n">for_type</span><span class="p">(</span><span class="n">Figure</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">fig</span><span class="p">:</span> <span class="n">print_figure</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="s1">&#39;png&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">))</span>
+<span class="g g-Whitespace">    </span><span class="mi">254</span>     <span class="k">if</span> <span class="s1">&#39;retina&#39;</span> <span class="ow">in</span> <span class="n">formats</span> <span class="ow">or</span> <span class="s1">&#39;png2x&#39;</span> <span class="ow">in</span> <span class="n">formats</span><span class="p">:</span>
+<span class="g g-Whitespace">    </span><span class="mi">255</span>         <span class="n">png_formatter</span><span class="o">.</span><span class="n">for_type</span><span class="p">(</span><span class="n">Figure</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">fig</span><span class="p">:</span> <span class="n">retina_figure</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">))</span>
+
+<span class="nn">~/.virtualenvs/cpsc554x/lib/python3.9/site-packages/IPython/core/pylabtools.py</span> in <span class="ni">print_figure</span><span class="nt">(fig, fmt, bbox_inches, **kwargs)</span>
+<span class="g g-Whitespace">    </span><span class="mi">135</span>         <span class="n">FigureCanvasBase</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">136</span> 
+<span class="ne">--&gt; </span><span class="mi">137</span>     <span class="n">fig</span><span class="o">.</span><span class="n">canvas</span><span class="o">.</span><span class="n">print_figure</span><span class="p">(</span><span class="n">bytes_io</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">138</span>     <span class="n">data</span> <span class="o">=</span> <span class="n">bytes_io</span><span class="o">.</span><span class="n">getvalue</span><span class="p">()</span>
+<span class="g g-Whitespace">    </span><span class="mi">139</span>     <span class="k">if</span> <span class="n">fmt</span> <span class="o">==</span> <span class="s1">&#39;svg&#39;</span><span class="p">:</span>
+
+<span class="nn">~/.virtualenvs/cpsc554x/lib/python3.9/site-packages/matplotlib/backend_bases.py</span> in <span class="ni">print_figure</span><span class="nt">(self, filename, dpi, facecolor, edgecolor, orientation, format, bbox_inches, pad_inches, bbox_extra_artists, backend, **kwargs)</span>
+<span class="g g-Whitespace">   </span><span class="mi">2228</span>                        <span class="k">else</span> <span class="n">suppress</span><span class="p">())</span>
+<span class="g g-Whitespace">   </span><span class="mi">2229</span>                 <span class="k">with</span> <span class="n">ctx</span><span class="p">:</span>
+<span class="ne">-&gt; </span><span class="mi">2230</span>                     <span class="bp">self</span><span class="o">.</span><span class="n">figure</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">renderer</span><span class="p">)</span>
+<span class="g g-Whitespace">   </span><span class="mi">2231</span> 
+<span class="g g-Whitespace">   </span><span class="mi">2232</span>             <span class="k">if</span> <span class="n">bbox_inches</span><span class="p">:</span>
+
+<span class="nn">~/.virtualenvs/cpsc554x/lib/python3.9/site-packages/matplotlib/artist.py</span> in <span class="ni">draw_wrapper</span><span class="nt">(artist, renderer, *args, **kwargs)</span>
+<span class="g g-Whitespace">     </span><span class="mi">72</span>     <span class="nd">@wraps</span><span class="p">(</span><span class="n">draw</span><span class="p">)</span>
+<span class="g g-Whitespace">     </span><span class="mi">73</span>     <span class="k">def</span> <span class="nf">draw_wrapper</span><span class="p">(</span><span class="n">artist</span><span class="p">,</span> <span class="n">renderer</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="ne">---&gt; </span><span class="mi">74</span>         <span class="n">result</span> <span class="o">=</span> <span class="n">draw</span><span class="p">(</span><span class="n">artist</span><span class="p">,</span> <span class="n">renderer</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+<span class="g g-Whitespace">     </span><span class="mi">75</span>         <span class="k">if</span> <span class="n">renderer</span><span class="o">.</span><span class="n">_rasterizing</span><span class="p">:</span>
+<span class="g g-Whitespace">     </span><span class="mi">76</span>             <span class="n">renderer</span><span class="o">.</span><span class="n">stop_rasterizing</span><span class="p">()</span>
+
+<span class="nn">~/.virtualenvs/cpsc554x/lib/python3.9/site-packages/matplotlib/artist.py</span> in <span class="ni">draw_wrapper</span><span class="nt">(artist, renderer, *args, **kwargs)</span>
+<span class="g g-Whitespace">     </span><span class="mi">49</span>                 <span class="n">renderer</span><span class="o">.</span><span class="n">start_filter</span><span class="p">()</span>
+<span class="g g-Whitespace">     </span><span class="mi">50</span> 
+<span class="ne">---&gt; </span><span class="mi">51</span>             <span class="k">return</span> <span class="n">draw</span><span class="p">(</span><span class="n">artist</span><span class="p">,</span> <span class="n">renderer</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+<span class="g g-Whitespace">     </span><span class="mi">52</span>         <span class="k">finally</span><span class="p">:</span>
+<span class="g g-Whitespace">     </span><span class="mi">53</span>             <span class="k">if</span> <span class="n">artist</span><span class="o">.</span><span class="n">get_agg_filter</span><span class="p">()</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+
+<span class="nn">~/.virtualenvs/cpsc554x/lib/python3.9/site-packages/matplotlib/figure.py</span> in <span class="ni">draw</span><span class="nt">(self, renderer)</span>
+<span class="g g-Whitespace">   </span><span class="mi">2788</span> 
+<span class="g g-Whitespace">   </span><span class="mi">2789</span>             <span class="bp">self</span><span class="o">.</span><span class="n">patch</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">renderer</span><span class="p">)</span>
+<span class="ne">-&gt; </span><span class="mi">2790</span>             <span class="n">mimage</span><span class="o">.</span><span class="n">_draw_list_compositing_images</span><span class="p">(</span>
+<span class="g g-Whitespace">   </span><span class="mi">2791</span>                 <span class="n">renderer</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">artists</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">suppressComposite</span><span class="p">)</span>
+<span class="g g-Whitespace">   </span><span class="mi">2792</span> 
+
+<span class="nn">~/.virtualenvs/cpsc554x/lib/python3.9/site-packages/matplotlib/image.py</span> in <span class="ni">_draw_list_compositing_images</span><span class="nt">(renderer, parent, artists, suppress_composite)</span>
+<span class="g g-Whitespace">    </span><span class="mi">130</span>     <span class="k">if</span> <span class="n">not_composite</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">has_images</span><span class="p">:</span>
+<span class="g g-Whitespace">    </span><span class="mi">131</span>         <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">artists</span><span class="p">:</span>
+<span class="ne">--&gt; </span><span class="mi">132</span>             <span class="n">a</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">renderer</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">133</span>     <span class="k">else</span><span class="p">:</span>
+<span class="g g-Whitespace">    </span><span class="mi">134</span>         <span class="c1"># Composite any adjacent images together</span>
+
+<span class="nn">~/.virtualenvs/cpsc554x/lib/python3.9/site-packages/matplotlib/artist.py</span> in <span class="ni">draw_wrapper</span><span class="nt">(artist, renderer, *args, **kwargs)</span>
+<span class="g g-Whitespace">     </span><span class="mi">49</span>                 <span class="n">renderer</span><span class="o">.</span><span class="n">start_filter</span><span class="p">()</span>
+<span class="g g-Whitespace">     </span><span class="mi">50</span> 
+<span class="ne">---&gt; </span><span class="mi">51</span>             <span class="k">return</span> <span class="n">draw</span><span class="p">(</span><span class="n">artist</span><span class="p">,</span> <span class="n">renderer</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+<span class="g g-Whitespace">     </span><span class="mi">52</span>         <span class="k">finally</span><span class="p">:</span>
+<span class="g g-Whitespace">     </span><span class="mi">53</span>             <span class="k">if</span> <span class="n">artist</span><span class="o">.</span><span class="n">get_agg_filter</span><span class="p">()</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+
+<span class="nn">~/.virtualenvs/cpsc554x/lib/python3.9/site-packages/matplotlib/_api/deprecation.py</span> in <span class="ni">wrapper</span><span class="nt">(*inner_args, **inner_kwargs)</span>
+<span class="g g-Whitespace">    </span><span class="mi">429</span>                          <span class="k">else</span> <span class="n">deprecation_addendum</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">430</span>                 <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+<span class="ne">--&gt; </span><span class="mi">431</span>         <span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">inner_args</span><span class="p">,</span> <span class="o">**</span><span class="n">inner_kwargs</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">432</span> 
+<span class="g g-Whitespace">    </span><span class="mi">433</span>     <span class="k">return</span> <span class="n">wrapper</span>
+
+<span class="nn">~/.virtualenvs/cpsc554x/lib/python3.9/site-packages/matplotlib/axes/_base.py</span> in <span class="ni">draw</span><span class="nt">(self, renderer, inframe)</span>
+<span class="g g-Whitespace">   </span><span class="mi">2919</span>             <span class="n">renderer</span><span class="o">.</span><span class="n">stop_rasterizing</span><span class="p">()</span>
+<span class="g g-Whitespace">   </span><span class="mi">2920</span> 
+<span class="ne">-&gt; </span><span class="mi">2921</span>         <span class="n">mimage</span><span class="o">.</span><span class="n">_draw_list_compositing_images</span><span class="p">(</span><span class="n">renderer</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">artists</span><span class="p">)</span>
+<span class="g g-Whitespace">   </span><span class="mi">2922</span> 
+<span class="g g-Whitespace">   </span><span class="mi">2923</span>         <span class="n">renderer</span><span class="o">.</span><span class="n">close_group</span><span class="p">(</span><span class="s1">&#39;axes&#39;</span><span class="p">)</span>
+
+<span class="nn">~/.virtualenvs/cpsc554x/lib/python3.9/site-packages/matplotlib/image.py</span> in <span class="ni">_draw_list_compositing_images</span><span class="nt">(renderer, parent, artists, suppress_composite)</span>
+<span class="g g-Whitespace">    </span><span class="mi">130</span>     <span class="k">if</span> <span class="n">not_composite</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">has_images</span><span class="p">:</span>
+<span class="g g-Whitespace">    </span><span class="mi">131</span>         <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">artists</span><span class="p">:</span>
+<span class="ne">--&gt; </span><span class="mi">132</span>             <span class="n">a</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">renderer</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">133</span>     <span class="k">else</span><span class="p">:</span>
+<span class="g g-Whitespace">    </span><span class="mi">134</span>         <span class="c1"># Composite any adjacent images together</span>
+
+<span class="nn">~/.virtualenvs/cpsc554x/lib/python3.9/site-packages/matplotlib/artist.py</span> in <span class="ni">draw_wrapper</span><span class="nt">(artist, renderer, *args, **kwargs)</span>
+<span class="g g-Whitespace">     </span><span class="mi">49</span>                 <span class="n">renderer</span><span class="o">.</span><span class="n">start_filter</span><span class="p">()</span>
+<span class="g g-Whitespace">     </span><span class="mi">50</span> 
+<span class="ne">---&gt; </span><span class="mi">51</span>             <span class="k">return</span> <span class="n">draw</span><span class="p">(</span><span class="n">artist</span><span class="p">,</span> <span class="n">renderer</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+<span class="g g-Whitespace">     </span><span class="mi">52</span>         <span class="k">finally</span><span class="p">:</span>
+<span class="g g-Whitespace">     </span><span class="mi">53</span>             <span class="k">if</span> <span class="n">artist</span><span class="o">.</span><span class="n">get_agg_filter</span><span class="p">()</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+
+<span class="nn">~/.virtualenvs/cpsc554x/lib/python3.9/site-packages/matplotlib/collections.py</span> in <span class="ni">draw</span><span class="nt">(self, renderer)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1010</span>     <span class="k">def</span> <span class="nf">draw</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">renderer</span><span class="p">):</span>
+<span class="g g-Whitespace">   </span><span class="mi">1011</span>         <span class="bp">self</span><span class="o">.</span><span class="n">set_sizes</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_sizes</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">figure</span><span class="o">.</span><span class="n">dpi</span><span class="p">)</span>
+<span class="ne">-&gt; </span><span class="mi">1012</span>         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">renderer</span><span class="p">)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1013</span> 
+<span class="g g-Whitespace">   </span><span class="mi">1014</span> 
+
+<span class="nn">~/.virtualenvs/cpsc554x/lib/python3.9/site-packages/matplotlib/artist.py</span> in <span class="ni">draw_wrapper</span><span class="nt">(artist, renderer, *args, **kwargs)</span>
+<span class="g g-Whitespace">     </span><span class="mi">49</span>                 <span class="n">renderer</span><span class="o">.</span><span class="n">start_filter</span><span class="p">()</span>
+<span class="g g-Whitespace">     </span><span class="mi">50</span> 
+<span class="ne">---&gt; </span><span class="mi">51</span>             <span class="k">return</span> <span class="n">draw</span><span class="p">(</span><span class="n">artist</span><span class="p">,</span> <span class="n">renderer</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+<span class="g g-Whitespace">     </span><span class="mi">52</span>         <span class="k">finally</span><span class="p">:</span>
+<span class="g g-Whitespace">     </span><span class="mi">53</span>             <span class="k">if</span> <span class="n">artist</span><span class="o">.</span><span class="n">get_agg_filter</span><span class="p">()</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+
+<span class="nn">~/.virtualenvs/cpsc554x/lib/python3.9/site-packages/matplotlib/collections.py</span> in <span class="ni">draw</span><span class="nt">(self, renderer)</span>
+<span class="g g-Whitespace">    </span><span class="mi">344</span>     <span class="nd">@artist</span><span class="o">.</span><span class="n">allow_rasterization</span>
+<span class="g g-Whitespace">    </span><span class="mi">345</span>     <span class="k">def</span> <span class="nf">draw</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">renderer</span><span class="p">):</span>
+<span class="ne">--&gt; </span><span class="mi">346</span>         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_visible</span><span class="p">():</span>
+<span class="g g-Whitespace">    </span><span class="mi">347</span>             <span class="k">return</span>
+<span class="g g-Whitespace">    </span><span class="mi">348</span>         <span class="n">renderer</span><span class="o">.</span><span class="n">open_group</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_gid</span><span class="p">())</span>
+
+<span class="ne">KeyboardInterrupt</span>: 
+</pre></div>
+</div>
 </div>
 </div>
 </div>
@@ -1925,7 +1552,7 @@ Feeltrace ::  2.9       &gt; 4.1296    =&gt;   False
         <a class="right-next" href="calibrated-words.html" title="next page">
             <div class="prevnext-info">
                 <p class="prevnext-label">next</p>
-                <p class="prevnext-title">Continuous self-report analysis</p>
+                <p class="prevnext-title">Calibrated words self-report analysis</p>
             </div>
             <i class="prevnext-label fas fa-angle-right"></i>
         </a>
