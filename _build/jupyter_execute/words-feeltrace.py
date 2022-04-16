@@ -4,7 +4,9 @@
 # # Feeltrace and calibrated words analysis
 # Rubia Guerra
 # 
-# Last updated: Apr 14th 2022
+# Last updated: Apr 16th 2022
+
+# TODO: Fix participant mappings (P2, P3... P20) -> (P1...P16)
 
 # ## Module definitions
 
@@ -21,6 +23,9 @@ import scipy.io as sio
 import seaborn as sns
 from scipy import signal
 from statsmodels.tsa import stattools
+from statsmodels.tsa.api import VAR
+from statsmodels.tsa.stattools import adfuller
+from statsmodels.tools.eval_measures import rmse, aic
 
 from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
 from sklearn.metrics import precision_recall_fscore_support
@@ -45,7 +50,7 @@ def load_dataset(data_dir = '../EEG/data/p*'):
     for subject_filename in feeltrace_data_files:
         mat_contents = sio.loadmat(subject_filename)
         df = pd.DataFrame(mat_contents['var'], columns=['Timestamps', 'Feeltrace'])
-        p_number = re.findall('p\d+', subject_filename) * df.shape[0]
+        p_number = [re.findall('p\d+', subject_filename)[0].strip('p')] * df.shape[0]
         df['p_number'] = p_number
         feeltrace_data.append(df)
     
@@ -63,7 +68,7 @@ def load_dataset(data_dir = '../EEG/data/p*'):
         df_data = list(zip(timestamp_data, subject_data))        
         df = pd.DataFrame(df_data, columns=['Timestamps', 'Values'])
 
-        p_number = re.findall('p\d+', subject_filename) * df.shape[0]
+        p_number = [re.findall('p\d+', subject_filename)[0].strip('p')] * df.shape[0]
         df['p_number'] = p_number
         subjects_data.append(df)
     
@@ -101,7 +106,7 @@ pd.concat(words_list).head()
 pd.concat(feeltrace_list).head()
 
 
-# ## Scratchpad
+# ## Single participant
 # 
 # Testing code with a single subject
 
@@ -452,7 +457,13 @@ plot_acf(p10_feeltrace_agg_mean_slope['Feeltrace'], lags=range(len(p10_feeltrace
 plt.ylim([-1.1, 1.1]);
 
 
-# #### Joint time series analysis
+# ### Joint time series analysis
+
+# Refer to _Ernst AF, Timmerman ME, Jeronimus BF, Albers CJ. Insight into individual differences in emotion dynamics with clustering. Assessment. 2021 Jun;28(4):1186-206._
+# 
+# *Adapted from [BioSciEconomist/ex VAR.py](https://gist.github.com/BioSciEconomist/197bd86ea61e0b4a49707af74a0b9f9c).
+
+# #### Granger Causality
 
 # The results of Granger Causality for P10 are promising, suggeting a significant relationship* between interview words and feeltrace.
 # 
@@ -462,7 +473,7 @@ plt.ylim([-1.1, 1.1]);
 
 
 from statsmodels.tsa.stattools import grangercausalitytests
-maxlag = 8
+maxlag = 1
 test = 'ssr_chi2test'
 
 def grangers_causation_matrix(data, variables, test='ssr_chi2test', verbose=False):    
@@ -479,15 +490,25 @@ def grangers_causation_matrix(data, variables, test='ssr_chi2test', verbose=Fals
     for c in df.columns:
         for r in df.index:
             test_result = grangercausalitytests(data[[r, c]], maxlag=maxlag, verbose=False)
-            p_values = [round(test_result[i+1][0][test][1], 4) for i in range(maxlag)]
+            p_values = [np.round(test_result[i+1][0][test][1], 5) for i in range(maxlag)]
             if verbose: print(f'Y = {r}, X = {c}, P Values = {p_values}')
             min_p_value = np.min(p_values)
+            if not min_p_value:
+                raise ValueError
             df.loc[r, c] = min_p_value
     df.columns = [var + '_x' for var in variables]
     df.index = [var + '_y' for var in variables]
     return df
 
-grangers_causation_matrix(p10_agg_data[['Words', 'Feeltrace']], variables = p10_agg_data[['Words', 'Feeltrace']].columns, verbose=True) 
+while True:
+    try:
+        grangers_causation_matrix(p10_agg_data[['Words', 'Feeltrace']], variables = p10_agg_data[['Words', 'Feeltrace']].columns, verbose=False) 
+        maxlag+=1
+    except ValueError:
+        maxlag-=1
+        grangers_causation_matrix(p10_agg_data[['Words', 'Feeltrace']], variables = p10_agg_data[['Words', 'Feeltrace']].columns, verbose=True) 
+        print(maxlag)
+        break
 
 # notes: 
 # The row are the Response (Y) and the columns are the predictor series (X).
@@ -496,11 +517,13 @@ grangers_causation_matrix(p10_agg_data[['Words', 'Feeltrace']], variables = p10_
 # the p-value of Feeltrace_x causing Words_y.
 
 
-# #### Limitations
+# ##### Limitations
 # 
 # (see https://en.wikipedia.org/wiki/Granger_causality#Limitations)
 # 
 # As its name implies, Granger causality is not necessarily true causality. In fact, the Granger-causality tests fulfill only the Humean definition of causality that identifies the cause-effect relations with constant conjunctions.[14] If both X and Y are driven by a common third process with different lags, one might still fail to reject the alternative hypothesis of Granger causality. Yet, manipulation of one of the variables would not change the other. Indeed, the Granger-causality tests are designed to handle pairs of variables, and may produce misleading results when the true relationship involves three or more variables. Having said this, it has been argued that given a probabilistic view of causation, Granger causality can be considered true causality in that sense, especially when Reichenbach's "screening off" notion of probabilistic causation is taken into account.[15] Other possible sources of misguiding test results are: (1) not frequent enough or too frequent sampling, (2) nonlinear causal relationship, (3) time series nonstationarity and nonlinearity and (4) existence of rational expectations.[14] A similar test involving more variables can be applied with vector autoregression. Recently [16] a fundamental mathematical study of the mechanism underlying the Granger method has been provided. By making use exclusively of mathematical tools (Fourier transformation and differential calculus), it has been found that not even the most basic requirement underlying any possible definition of causality is met by the Granger causality test: any definition of causality should refer to the prediction of the future from the past; instead by inverting the time series it can be shown that Granger allows one to ”predict” the past from the future as well. 
+
+# #### Cointegration
 
 # In[33]:
 
@@ -534,13 +557,20 @@ def cointegration_test(df, alpha=0.05):
     cvts = out.cvt[:, d[str(1-alpha)]]
     def adjust(val, length= 6): return str(val).ljust(length)
 
+    results = []
+
     # Summary
     print('Name   ::  Test Stat > C(95%)    =>   Signif  \n', '--'*20)
     for col, trace, cvt in zip(df.columns, traces, cvts):
         print(adjust(col), ':: ', adjust(round(trace,2), 9), ">", adjust(cvt, 8), ' =>  ' , trace > cvt)
+        results.append({col: [trace, cvt, trace > cvt]})
+        
+    return results
 
 cointegration_test(p10_agg_data[['Words', 'Feeltrace']])
 
+
+# #### Stationarity
 
 # In[34]:
 
@@ -587,14 +617,472 @@ for name, column in p10_agg_data.iteritems():
     if 'Timestamps' in name:
         continue
     adfuller_test(column, name=column.name)
-    print('\n')       
+    print('\n')    
+    
+diff = p10_agg_data.diff().dropna()
 
+# ADF Test on each column
+for name, column in diff.iteritems():
+    if 'Timestamps' in name:
+        continue
+    adfuller_test(column, name=column.name)
+    print('\n')   
+
+
+# #### Pearson's correlation
 
 # In[35]:
 
 
 p10_agg_data[['Words', 'Feeltrace']].corr()
 
+
+# #### VAR Model
+
+# ##### Training and validation data
+
+# In[36]:
+
+
+# The VAR model will be fitted on df_train and then used to forecast the next 4 
+# observations. These forecasts will be compared against the actuals present in 
+# test data.
+
+
+nobs = 4
+df_train, df_test = p10_agg_data[0:-nobs], p10_agg_data[-nobs:]
+
+# Check size
+print(df_train.shape)  # (119, 8)
+print(df_test.shape)  # (4, 8)
+
+
+# ##### Fitting
+
+# In[37]:
+
+
+#---------------------------------------
+# fitting the order of the VAR
+#--------------------------------------
+
+# To select the right order of the VAR model, we iteratively fit increasing orders 
+# of VAR model and pick the order that gives a model with least AIC.
+
+df_train_diff = df_train.diff().dropna()
+
+model = VAR(df_train_diff[['Words', 'Feeltrace']])
+for i in [1,2,3,4,5, 6, 7]:
+    result = model.fit(i)
+    print('Lag Order =', i)
+    print('AIC : ', result.aic)
+    print('BIC : ', result.bic)
+    print('FPE : ', result.fpe)
+    print('HQIC: ', result.hqic, '\n')
+
+
+# In[38]:
+
+
+# In the above output, the AIC drops to lowest at lag 4, then increases at 
+# lag 5 and then continuously drops further. (more negative = 'smaller' AIC)
+
+#---------------------------------
+# alterntative: auto fit
+#---------------------------------
+
+x = model.select_order(maxlags=7)
+x.summary()
+
+
+# In[39]:
+
+
+#----------------------------------
+# fit VAR(5)
+#---------------------------------
+
+model_fitted = model.fit(7)
+model_fitted.summary()
+
+
+# ##### Check for remaining serial correlation
+
+# In[40]:
+
+
+# Serial correlation of residuals is used to check if there is any leftover pattern 
+# in the residuals (errors). If there is any correlation left in the residuals, then,
+# there is some pattern in the time series that is still left to be explained by the
+# model. In that case, the typical course of action is to either increase the order
+# of the model or induce more predictors into the system or look for a different 
+# algorithm to model the time series.
+
+# A common way of checking for serial correlation of errors can be measured using 
+# the Durbin Watson’s Statistic.
+
+# The value of this statistic can vary between 0 and 4. The closer it is to the value 
+# 2, then there is no significant serial correlation. The closer to 0, there is a 
+# positive serial correlation, and the closer it is to 4 implies negative serial 
+# correlation.
+
+from statsmodels.stats.stattools import durbin_watson
+out = durbin_watson(model_fitted.resid)
+
+# for col, val in zip(df.columns, out):
+#    print(adjust(col), ':', round(val, 2))
+    
+for col, val in zip(p10_agg_data[['Words', 'Feeltrace']].columns, out):
+    print(col, ':', round(val, 2))
+
+
+# ##### Forecasting
+
+# In[41]:
+
+
+#--------------------------------------
+# forecasting
+#--------------------------------------
+
+# In order to forecast, the VAR model expects up to the lag order number of 
+# observations from the past data. This is because, the terms in the VAR model 
+# are essentially the lags of the various time series in the dataset, so you 
+# need to provide it as many of the previous values as indicated by the lag order
+# used by the model.
+
+# Get the lag order (we already know this)
+lag_order = model_fitted.k_ar
+print(lag_order)  #> 4
+
+# Input data for forecasting
+forecast_input = df_train_diff[['Words', 'Feeltrace']].values[-lag_order:]
+forecast_input
+
+# Forecast
+fc = model_fitted.forecast(y=forecast_input, steps=nobs) # nobs defined at top of program
+df_forecast = pd.DataFrame(fc, index=p10_agg_data[['Words', 'Feeltrace']].index[-nobs:], columns=p10_agg_data[['Words', 'Feeltrace']].columns + '_1d')
+df_forecast
+
+
+# In[42]:
+
+
+# The forecasts are generated but it is on the scale of the training data used by 
+# the model. So, to bring it back up to its original scale, you need to de-difference 
+# it as many times you had differenced the original input data.
+
+def invert_transformation(df_train, df_forecast, second_diff=False):
+    """Revert back the differencing to get the forecast to original scale."""
+    df_fc = df_forecast.copy()
+    columns = df_train.columns
+    for col in columns:     
+        if 'Timestamp' in col:
+            continue
+        # Roll back 2nd Diff
+        if second_diff:
+            df_fc[str(col)+'_1d'] = (df_train[col].iloc[-1]-df_train[col].iloc[-2]) + df_fc[str(col)+'_2d'].cumsum()
+        # Roll back 1st Diff
+        df_fc[str(col)+'_forecast'] = df_train[col].iloc[-1] + df_fc[str(col)+'_1d'].cumsum()
+    return df_fc
+
+
+df_results = invert_transformation(df_train, df_forecast, second_diff=False)        
+df_results.loc[:, ['Words_1d', 'Feeltrace_1d']]
+
+#---------------------------
+# plot forecasts
+#---------------------------
+
+
+fig, axes = plt.subplots(nrows=int(len(p10_agg_data.columns)/2), ncols=2, dpi=150, figsize=(10,10))
+for i, (col,ax) in enumerate(zip(p10_agg_data[['Words', 'Feeltrace']].columns, axes.flatten())):
+    df_results[col+'_forecast'].plot(legend=True, ax=ax).autoscale(axis='x',tight=True)
+    df_test[col][-nobs:].plot(legend=True, ax=ax);
+    ax.set_title(col + ": Forecast vs Actuals")
+    ax.xaxis.set_ticks_position('none')
+    ax.yaxis.set_ticks_position('none')
+    ax.spines["top"].set_alpha(0)
+    ax.tick_params(labelsize=6)
+
+plt.tight_layout();
+
+
+# ##### Accuracy
+
+# In[43]:
+
+
+from statsmodels.tsa.stattools import acf
+
+def forecast_accuracy(forecast, actual):
+    mape = np.mean(np.abs(forecast - actual)/np.abs(actual))  # MAPE
+    me = np.mean(forecast - actual)             # ME
+    mae = np.mean(np.abs(forecast - actual))    # MAE
+    mpe = np.mean((forecast - actual)/actual)   # MPE
+    rmse = np.mean((forecast - actual)**2)**.5  # RMSE
+    corr = np.corrcoef(forecast, actual)[0,1]   # corr
+    mins = np.amin(np.hstack([forecast[:,None], 
+                              actual[:,None]]), axis=1)
+    maxs = np.amax(np.hstack([forecast[:,None], 
+                              actual[:,None]]), axis=1)
+    minmax = 1 - np.mean(mins/maxs)             # minmax
+    return({'mape':mape, 'me':me, 'mae': mae, 
+            'mpe': mpe, 'rmse':rmse, 'corr':corr, 'minmax':minmax})
+
+print('Forecast Accuracy of: Words')
+accuracy_prod = forecast_accuracy(df_results['Words_forecast'].values, df_test['Words'])
+for k, v in accuracy_prod.items():
+    print(k, ': ', round(v,4))
+
+print('\nForecast Accuracy of: Feeltrace')
+accuracy_prod = forecast_accuracy(df_results['Feeltrace_forecast'].values, df_test['Feeltrace'])
+for k, v in accuracy_prod.items():
+    print(k, ': ', round(v,4))
+
+
+# In[44]:
+
+
+model_fitted.coefs
+
+
+# ## All participants
+
+# In[ ]:
+
+
+
+
+
+# ### Downsampling the continuous annotation
+
+# Before time series analysis can be performed, we must downsample the feeltrace to match the sample size of the interview words (or upsample the interview words):
+# - $\text{Fs}_{\text{feeltrace}} = 30$Hz
+# - $\text{Fs}_{\text{calibrated words}} \approx 0.05$Hz
+
+# In[45]:
+
+
+def scale(X, min_=0, max_=200):
+    return (X - min_)/(max_ - min_)
+
+
+# In[46]:
+
+
+n_windows = []
+granger_p_values = []
+cointegration_p_values = []
+pearsons_corr = []
+var_models = []
+
+for (p_words, p_feeltrace) in zip(words_list, feeltrace_list):
+    p_words = p_words.copy()
+    p_feeltrace = p_feeltrace.copy()
+
+    p_words.Values = scale(p_words.Values)
+    p_feeltrace.Feeltrace = scale(p_feeltrace.Feeltrace)
+    
+    timestamps = p_words.Timestamps.rolling(2).mean().dropna().reset_index(drop=True)
+    timestamps.head()
+    
+    idxs = []
+
+    for timestamp in timestamps:
+        arr = p_feeltrace.Timestamps.to_numpy().astype(int)
+        dist = (arr - timestamp)**2
+        idx = tuple(np.argwhere(dist == np.min(dist))[0])
+        idxs.append(idx[0])
+    
+    feeltrace_timestamps = list(p_feeltrace.loc[idxs, 'Timestamps'].rolling(2).mean().reset_index(drop=True))
+
+    # add first timestamp
+    feeltrace_timestamps[0] = p_feeltrace.loc[idxs[0], 'Timestamps'] / 2
+
+    # add last timestamp
+    feeltrace_timestamps.append((p_feeltrace.Timestamps.iloc[-1] + p_feeltrace.loc[idxs[-1], 'Timestamps']) / 2)
+
+    feeltrace_timestamps = pd.Series(feeltrace_timestamps)
+    
+    # make sure both series are the same length
+    assert(len(feeltrace_timestamps) == len(p_words.Timestamps))
+    
+    n_windows.append({'p_number': p_words.p_number[0], 'n_windows': len(feeltrace_timestamps)})
+    
+    p_feeltrace_agg_mean = pd.DataFrame()
+
+    mean_feeltrace = []
+
+    # first window
+    mean_feeltrace.append(p_feeltrace.Feeltrace.loc[:idxs[0]].mean())
+
+    # middle windows
+    for (prev_idx, idx) in zip(idxs[:-1], idxs[1:]):
+        mean_feeltrace.append(p_feeltrace.Feeltrace.loc[prev_idx:idx].mean())
+
+    # last window
+    mean_feeltrace.append(p_feeltrace.Feeltrace.loc[idxs[-1]:].mean())
+
+    # make sure both feeltrace and interview series are the same size
+    assert(len(mean_feeltrace) == len(p_words.Values))
+
+    p_feeltrace_agg_mean['Timestamps'] = feeltrace_timestamps
+    p_feeltrace_agg_mean['Feeltrace'] = mean_feeltrace
+    
+    p_feeltrace_agg_slope = pd.DataFrame()
+
+    slope_feeltrace = []
+
+    # first window
+    slope_feeltrace.append(change_direction(p_feeltrace.Feeltrace[:idxs[0]], p_feeltrace.Timestamps[:idxs[0]]))
+
+    # middle windows
+    for (prev_idx, idx) in zip(idxs[:-1], idxs[1:]):
+        slope_feeltrace.append(change_direction(p_feeltrace.Feeltrace.loc[prev_idx:idx], p_feeltrace.Timestamps.loc[prev_idx:idx]))
+
+    # last window
+    slope_feeltrace.append(change_direction(p_feeltrace.Feeltrace.loc[idxs[-1]:], p_feeltrace.Timestamps.loc[idxs[-1]:]))
+
+    # make sure both feeltrace and interview series are the same size
+    assert(len(slope_feeltrace) == len(p_words.Values))
+
+    p_feeltrace_agg_slope['Timestamps'] = feeltrace_timestamps
+    p_feeltrace_agg_slope['Feeltrace'] = slope_feeltrace
+    p_feeltrace_agg_slope.head()
+    
+    p_feeltrace_agg_mean_slope = pd.DataFrame()
+
+    mean_feeltrace_words = []
+    indexes = list(p_feeltrace_agg_mean.index)
+
+    # middle windows
+    for (prev_idx, idx) in zip(indexes[:-1], indexes[1:]):
+        mean_feeltrace_words.append(change_direction(p_feeltrace_agg_mean.Feeltrace.loc[prev_idx:idx], p_feeltrace_agg_mean.Timestamps.loc[prev_idx:idx]))
+
+    p_feeltrace_agg_mean_slope['Feeltrace'] = mean_feeltrace_words
+    p_feeltrace_agg_mean_slope['Timestamps'] = timestamps
+    p_feeltrace_agg_mean_slope.head()
+    
+    p_words_agg_slope = pd.DataFrame()
+
+    slope_words = []
+    indexes = list(p_words.index)
+
+    # middle windows
+    for (prev_idx, idx) in zip(indexes[:-1], indexes[1:]):
+        slope_words.append(change_direction(p_words.Values.loc[prev_idx:idx], p_words.Timestamps.loc[prev_idx:idx]))
+
+    p_words_agg_slope['Values'] = slope_words
+    p_words_agg_slope['Timestamps'] = timestamps
+    p_words_agg_slope.head()
+    
+    p_agg_data = pd.DataFrame()
+    p_agg_data['Timestamps'] = p_words_agg_slope['Timestamps'].copy()
+    p_agg_data['Words'] = p_words_agg_slope['Values'].copy()
+    p_agg_data['Feeltrace'] = p_feeltrace_agg_mean_slope['Feeltrace'].copy()
+    
+    maxlag = 1
+    
+    while True:
+        try:
+            grangers_causation_matrix(p_agg_data[['Words', 'Feeltrace']], variables = p_agg_data[['Words', 'Feeltrace']].columns) 
+            maxlag+=1
+        except ValueError:
+            maxlag-=1
+            granger_p_values.append(grangers_causation_matrix(p_agg_data[['Words', 'Feeltrace']], variables = p_agg_data[['Words', 'Feeltrace']].columns))
+            break
+            
+    cointegration_p_values.append(cointegration_test(p_agg_data[['Words', 'Feeltrace']]))
+    pearsons_corr.append(p_agg_data[['Words', 'Feeltrace']].corr())
+    
+    # The VAR model will be fitted on df_train and then used to forecast the next 4 
+    # observations. These forecasts will be compared against the actuals present in 
+    # test data.
+
+
+    nobs = 4
+    df_train, df_test = p_agg_data[0:-nobs], p_agg_data[-nobs:]
+
+    # Check size
+    model = VAR(df_train[['Words', 'Feeltrace']])
+
+    maxlag = 1
+
+    while True:
+        try:
+            x = model.select_order(maxlags=maxlag)
+            maxlag+=1
+        except ValueError:
+            maxlag-=1
+            x = model.select_order(maxlags=maxlag)
+            model_fitted = model.fit(maxlag)
+            break
+
+    var_models.append([x, model_fitted])
+
+
+# The number of windows corresponds to the number of words each participant used:
+
+# In[47]:
+
+
+n_windows = pd.DataFrame(n_windows)
+n_windows['n_windows'].describe()
+
+
+# In[48]:
+
+
+plt.figure(figsize=(5,7));
+sns.barplot(data=n_windows, x='p_number', y='n_windows', color='c');
+plt.ylabel('# of windows');
+plt.axhline(n_windows['n_windows'].mean(), c='k', alpha=0.2, linestyle='dashed');
+
+
+# All results in the next sections are ordered according to p_number:
+
+# In[49]:
+
+
+n_windows
+
+
+# ### Granger Causality
+# 
+# TODO: summarize
+
+# In[50]:
+
+
+for value in granger_p_values:
+    print(value < 0.05)
+
+
+# ### Cointegration
+# TODO: summarize
+
+# In[51]:
+
+
+cointegration_p_values
+
+
+# ### Pearson's correlation
+# 
+# TODO: calculate significance
+
+# In[52]:
+
+
+pearsons_corr
+
+
+# #### VAR Model
+# 
+# TODO: 
+# - Summarize VAR model results
+# - Cluster using VAR coefficients
 
 # ## Emotion dynamics analysis
 # 
@@ -606,7 +1094,7 @@ p10_agg_data[['Words', 'Feeltrace']].corr()
 # - **Emotional instability:** refers to the magnitude of emotional changes from one moment to the next. An individual characterized by high levels of instability experiences larger emotional shifts from one moment to the next, resulting in a more unstable emotional life.
 # - **Emotional variability:** refers to the range or amplitude of someone’s emotional states across time. An individual characterized by higher levels of emotional variability experiences emotions that reach more extreme levels and shows larger emotional deviations from his or her average emotional level
 
-# In[36]:
+# In[53]:
 
 
 class EmotionDynamics:
@@ -633,14 +1121,14 @@ class EmotionDynamics:
         return parameters
 
 
-# In[37]:
+# In[54]:
 
 
 ED = EmotionDynamics(Fs=0.05)
 ED.get_parameters(p10_words['Values'])
 
 
-# In[38]:
+# In[55]:
 
 
 words_data = []
@@ -654,7 +1142,7 @@ words_data = pd.DataFrame(words_data)
 words_data.head()
 
 
-# In[39]:
+# In[56]:
 
 
 ED = EmotionDynamics(Fs=30)
@@ -670,7 +1158,7 @@ feeltrace_data = pd.DataFrame(feeltrace_data)
 feeltrace_data.head()
 
 
-# In[40]:
+# In[57]:
 
 
 X = pd.concat([words_data, feeltrace_data]).reset_index(drop=True)
@@ -680,14 +1168,14 @@ X
 # ### Data preprocessing: scaling
 # Standardize features by removing the mean and scaling to unit variance.
 
-# In[41]:
+# In[58]:
 
 
 from sklearn.preprocessing import StandardScaler
 scaler = StandardScaler()
 
 
-# In[42]:
+# In[59]:
 
 
 X_feeltrace = scaler.fit_transform(feeltrace_data[['Inertia', 'Instability', 'Variability']])
@@ -697,7 +1185,7 @@ X_feeltrace['pass'] = feeltrace_data['pass']
 X_feeltrace
 
 
-# In[43]:
+# In[60]:
 
 
 X_words = scaler.fit_transform(words_data[['Inertia', 'Instability', 'Variability']])
@@ -707,7 +1195,7 @@ X_words['pass'] = words_data['pass']
 X_words
 
 
-# In[44]:
+# In[61]:
 
 
 X_scaled = pd.concat([X_words, X_feeltrace]).reset_index(drop=True)
@@ -715,13 +1203,13 @@ X_scaled = pd.concat([X_words, X_feeltrace]).reset_index(drop=True)
 
 # ### Pairplot analysis
 
-# In[45]:
+# In[62]:
 
 
 sns.pairplot(X_scaled, hue='pass');
 
 
-# In[46]:
+# In[63]:
 
 
 abs(X_feeltrace[['Inertia', 'Instability', 'Variability']] - X_words[['Inertia', 'Instability', 'Variability']])
@@ -729,18 +1217,21 @@ abs(X_feeltrace[['Inertia', 'Instability', 'Variability']] - X_words[['Inertia',
 
 # ### 3D scatterplot
 
-# In[47]:
+# TODO: color according to labelling pass
+
+# In[64]:
 
 
 import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 
-fig = plt.figure()
+fig = plt.figure(figsize=(15,10))
 ax = Axes3D(fig, rect=[0, 0, 0.95, 1], elev=48, azim=130, auto_add_to_figure=False, facecolor='w')
 fig.add_axes(ax)
 
-ax.scatter(X_scaled.Inertia, X_scaled.Instability, X_scaled.Variability, cmap=plt.cm.nipy_spectral, edgecolor="k")
+ax.scatter(X_scaled.Inertia, X_scaled.Instability, X_scaled.Variability, 
+           cmap=plt.cm.nipy_spectral, edgecolor="k")
 
 for (_, subject) in X_scaled.iterrows(): #plot each point + it's index as text above
     label = subject['p_number']
@@ -756,7 +1247,7 @@ plt.show()
 
 # ### Principal Component Analysis
 
-# In[48]:
+# In[65]:
 
 
 import numpy as np
@@ -768,7 +1259,8 @@ pca = decomposition.PCA(n_components=2)
 pca.fit(X_scaled[['Inertia', 'Instability', 'Variability']])
 X_PCA = pca.transform(X_scaled[['Inertia', 'Instability', 'Variability']])
 
-sns.scatterplot(x=X_PCA[:, 0], y=X_PCA[:, 1]);
+plt.figure(figsize=(15,10))
+sns.scatterplot(data=X, x=X_PCA[:, 0], y=X_PCA[:, 1], hue='pass');
 
 for i, (_, subject) in enumerate(X_scaled.iterrows()): #plot each point + it's index as text above
     label = subject['p_number']
@@ -776,9 +1268,47 @@ for i, (_, subject) in enumerate(X_scaled.iterrows()): #plot each point + it's i
     color='k') 
 
 
+# In[66]:
+
+
+X_PCA = pd.DataFrame(X_PCA, columns=['PC1', 'PC2'])
+X_PCA['p_number'] = X_scaled['p_number']
+X_PCA['pass'] = X_scaled['pass']
+X_PCA.head()
+
+
+# In[67]:
+
+
+# TODO: fix colors
+
+from scipy.spatial import distance
+
+pass_distance = []
+
+for subject in X_PCA.groupby('p_number'):
+    subject = subject[1]
+    subject_interview = subject.loc[subject['pass'] == 'interview', ['PC1', 'PC2']]
+    subject_feeltrace = subject.loc[subject['pass'] == 'feeltrace', ['PC1', 'PC2']]
+    pass_distance.append({'p_number': subject.p_number.iloc[0], 'Distance': distance.euclidean(subject_interview, subject_feeltrace)})
+
+pass_distance = pd.DataFrame(pass_distance)
+sns.barplot(data=pass_distance, x='p_number', y='Distance');
+
+
+# ### Repeated Measures Analysis
+
+# In[68]:
+
+
+X_scaled.pivot(columns='pass').to_csv('scaled_ed_per_pass.csv', index=False)
+
+
+# See Jamovi results.
+
 # ### Gaussian Mixture Model
 
-# In[49]:
+# In[69]:
 
 
 """
@@ -847,8 +1377,10 @@ spl.set_xlabel("Number of components")
 spl.legend([b[0] for b in bars], cv_types);
 
 
-# In[50]:
+# In[70]:
 
+
+# TODO: Fix legend
 
 # Plot the winner
 fig = plt.figure(figsize=(15,10))
@@ -879,4 +1411,16 @@ plt.title(
 
 
 plt.show()
+
+
+# In[ ]:
+
+
+
+
+
+# In[ ]:
+
+
+
 
