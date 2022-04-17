@@ -357,11 +357,22 @@ const thebe_selector_output = ".output, .cell_output"
         <span class="n">df_data</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">timestamp_data</span><span class="p">,</span> <span class="n">subject_data</span><span class="p">))</span>        
         <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">df_data</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Timestamp&#39;</span><span class="p">,</span> <span class="s1">&#39;Values&#39;</span><span class="p">])</span>
 
-        <span class="n">p_number</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="s1">&#39;p\d+&#39;</span><span class="p">,</span> <span class="n">subject_filename</span><span class="p">)</span> <span class="o">*</span> <span class="n">df</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">p_number</span> <span class="o">=</span> <span class="p">[</span><span class="n">p_num_map</span><span class="p">[</span><span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="s1">&#39;p\d+&#39;</span><span class="p">,</span> <span class="n">subject_filename</span><span class="p">)[</span><span class="mi">0</span><span class="p">]]]</span> <span class="o">*</span> <span class="n">df</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        
         <span class="n">df</span><span class="p">[</span><span class="s1">&#39;p_number&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">p_number</span>
         <span class="n">subjects_data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
     
     <span class="k">return</span> <span class="n">subjects_data</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">p_num_map</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;p2&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;p4&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;p5&#39;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="s1">&#39;p6&#39;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span> 
+             <span class="s1">&#39;p7&#39;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span> <span class="s1">&#39;p8&#39;</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span> <span class="s1">&#39;p9&#39;</span><span class="p">:</span> <span class="mi">7</span><span class="p">,</span> <span class="s1">&#39;p10&#39;</span><span class="p">:</span> <span class="mi">8</span><span class="p">,</span> 
+             <span class="s1">&#39;p12&#39;</span><span class="p">:</span> <span class="mi">9</span><span class="p">,</span> <span class="s1">&#39;p13&#39;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span> <span class="s1">&#39;p15&#39;</span><span class="p">:</span> <span class="mi">11</span><span class="p">,</span> <span class="s1">&#39;p17&#39;</span><span class="p">:</span> <span class="mi">12</span><span class="p">,</span> 
+             <span class="s1">&#39;p19&#39;</span><span class="p">:</span> <span class="mi">13</span><span class="p">,</span> <span class="s1">&#39;p20&#39;</span><span class="p">:</span> <span class="mi">14</span><span class="p">,</span> <span class="s1">&#39;p22&#39;</span><span class="p">:</span> <span class="mi">15</span><span class="p">,</span> <span class="s1">&#39;p23&#39;</span><span class="p">:</span> <span class="mi">16</span><span class="p">}</span>
 </pre></div>
 </div>
 </div>
@@ -408,31 +419,31 @@ const thebe_selector_output = ".output, .cell_output"
       <th>0</th>
       <td>41100</td>
       <td>100.0</td>
-      <td>p10</td>
+      <td>8</td>
     </tr>
     <tr>
       <th>1</th>
       <td>66900</td>
       <td>110.0</td>
-      <td>p10</td>
+      <td>8</td>
     </tr>
     <tr>
       <th>2</th>
       <td>86833</td>
       <td>185.0</td>
-      <td>p10</td>
+      <td>8</td>
     </tr>
     <tr>
       <th>3</th>
       <td>109466</td>
       <td>185.0</td>
-      <td>p10</td>
+      <td>8</td>
     </tr>
     <tr>
       <th>4</th>
       <td>152233</td>
       <td>115.0</td>
-      <td>p10</td>
+      <td>8</td>
     </tr>
   </tbody>
 </table>
@@ -474,31 +485,31 @@ const thebe_selector_output = ".output, .cell_output"
       <th>0</th>
       <td>41100</td>
       <td>100.0</td>
-      <td>p10</td>
+      <td>8</td>
     </tr>
     <tr>
       <th>1</th>
       <td>66900</td>
       <td>110.0</td>
-      <td>p10</td>
+      <td>8</td>
     </tr>
     <tr>
       <th>2</th>
       <td>86833</td>
       <td>185.0</td>
-      <td>p10</td>
+      <td>8</td>
     </tr>
     <tr>
       <th>3</th>
       <td>109466</td>
       <td>185.0</td>
-      <td>p10</td>
+      <td>8</td>
     </tr>
     <tr>
       <th>4</th>
       <td>152233</td>
       <td>115.0</td>
-      <td>p10</td>
+      <td>8</td>
     </tr>
   </tbody>
 </table>
@@ -516,7 +527,7 @@ const thebe_selector_output = ".output, .cell_output"
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="_images/calibrated-words_10_0.png" src="_images/calibrated-words_10_0.png" />
+<img alt="_images/calibrated-words_11_0.png" src="_images/calibrated-words_11_0.png" />
 </div>
 </div>
 <div class="cell docutils container">
@@ -550,12 +561,12 @@ const thebe_selector_output = ".output, .cell_output"
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="_images/calibrated-words_12_0.png" src="_images/calibrated-words_12_0.png" />
-<img alt="_images/calibrated-words_12_1.png" src="_images/calibrated-words_12_1.png" />
-<img alt="_images/calibrated-words_12_2.png" src="_images/calibrated-words_12_2.png" />
-<img alt="_images/calibrated-words_12_3.png" src="_images/calibrated-words_12_3.png" />
-<img alt="_images/calibrated-words_12_4.png" src="_images/calibrated-words_12_4.png" />
-<img alt="_images/calibrated-words_12_5.png" src="_images/calibrated-words_12_5.png" />
+<img alt="_images/calibrated-words_13_0.png" src="_images/calibrated-words_13_0.png" />
+<img alt="_images/calibrated-words_13_1.png" src="_images/calibrated-words_13_1.png" />
+<img alt="_images/calibrated-words_13_2.png" src="_images/calibrated-words_13_2.png" />
+<img alt="_images/calibrated-words_13_3.png" src="_images/calibrated-words_13_3.png" />
+<img alt="_images/calibrated-words_13_4.png" src="_images/calibrated-words_13_4.png" />
+<img alt="_images/calibrated-words_13_5.png" src="_images/calibrated-words_13_5.png" />
 </div>
 </div>
 </div>
@@ -570,14 +581,14 @@ const thebe_selector_output = ".output, .cell_output"
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">statsmodels.graphics.tsaplots</span> <span class="kn">import</span> <span class="n">plot_acf</span>
 
-<span class="k">def</span> <span class="nf">plot_autocorr</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">num_columns</span><span class="p">,</span> <span class="n">lags</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">figsize_per_row</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">plot_autocorr</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">num_columns</span><span class="p">,</span> <span class="n">lags</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">figsize_per_row</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">savefig</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="s2">&quot;plot_autocorr.png&quot;</span><span class="p">):</span>
     <span class="n">X_by_participant</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;p_number&#39;</span><span class="p">))</span>
     <span class="k">if</span> <span class="n">figsize_per_row</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">figsize_per_row</span> <span class="o">=</span> <span class="p">(</span><span class="mi">25</span><span class="p">,</span> <span class="mi">15</span><span class="o">/</span><span class="n">num_columns</span><span class="p">)</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
-            <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="n">figsize_per_row</span><span class="p">)</span>
-            <span class="n">fig</span><span class="o">.</span><span class="n">subplots_adjust</span><span class="p">(</span><span class="n">hspace</span><span class="o">=</span><span class="mf">0.4</span><span class="p">,</span> <span class="n">wspace</span><span class="o">=</span><span class="mf">0.4</span><span class="p">)</span>
+            <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="n">figsize_per_row</span><span class="p">);</span>
+            <span class="n">fig</span><span class="o">.</span><span class="n">subplots_adjust</span><span class="p">(</span><span class="n">hspace</span><span class="o">=</span><span class="mf">0.4</span><span class="p">,</span> <span class="n">wspace</span><span class="o">=</span><span class="mf">0.1</span><span class="p">);</span>
             <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_columns</span><span class="p">):</span>
                 <span class="n">pnum</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">X_by_participant</span><span class="p">)</span>
                 <span class="n">series</span>  <span class="o">=</span> <span class="n">pnum</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">Values</span>
@@ -586,6 +597,8 @@ const thebe_selector_output = ".output, .cell_output"
                 <span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">num_columns</span><span class="p">,</span> <span class="n">col</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
                 <span class="n">plot_acf</span><span class="p">(</span><span class="n">series</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">lags</span><span class="o">=</span><span class="n">lags</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="n">pnum</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">zero</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="c1"># autocorr for all lags &lt; 1 min</span>
                 <span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">([</span><span class="o">-</span><span class="mf">1.15</span><span class="p">,</span><span class="mf">1.15</span><span class="p">])</span>
+                <span class="k">if</span> <span class="n">savefig</span><span class="p">:</span>
+                    <span class="n">fig</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">filename</span><span class="p">);</span>
     <span class="k">except</span> <span class="ne">StopIteration</span><span class="p">:</span>
         <span class="k">pass</span>
 </pre></div>
@@ -598,17 +611,22 @@ const thebe_selector_output = ".output, .cell_output"
 X-axis: lag index (0 to 1 min, Fs = 30Hz)</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plot_autocorr</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plot_autocorr</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="mi">2</span><span class="p">);</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="_images/calibrated-words_18_0.png" src="_images/calibrated-words_18_0.png" />
-<img alt="_images/calibrated-words_18_1.png" src="_images/calibrated-words_18_1.png" />
-<img alt="_images/calibrated-words_18_2.png" src="_images/calibrated-words_18_2.png" />
-<img alt="_images/calibrated-words_18_3.png" src="_images/calibrated-words_18_3.png" />
-<img alt="_images/calibrated-words_18_4.png" src="_images/calibrated-words_18_4.png" />
-<img alt="_images/calibrated-words_18_5.png" src="_images/calibrated-words_18_5.png" />
+<img alt="_images/calibrated-words_19_0.png" src="_images/calibrated-words_19_0.png" />
+<img alt="_images/calibrated-words_19_1.png" src="_images/calibrated-words_19_1.png" />
+<img alt="_images/calibrated-words_19_2.png" src="_images/calibrated-words_19_2.png" />
+<img alt="_images/calibrated-words_19_3.png" src="_images/calibrated-words_19_3.png" />
+<img alt="_images/calibrated-words_19_4.png" src="_images/calibrated-words_19_4.png" />
+<img alt="_images/calibrated-words_19_5.png" src="_images/calibrated-words_19_5.png" />
+<img alt="_images/calibrated-words_19_6.png" src="_images/calibrated-words_19_6.png" />
+<img alt="_images/calibrated-words_19_7.png" src="_images/calibrated-words_19_7.png" />
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;Figure size 1800x540 with 0 Axes&gt;
+</pre></div>
+</div>
 </div>
 </div>
 </div>
@@ -725,31 +743,31 @@ X-axis: lag index (0 to 1 min, Fs = 30Hz)</p>
       <th>0</th>
       <td>103000</td>
       <td>100.0</td>
-      <td>p12</td>
+      <td>9</td>
     </tr>
     <tr>
       <th>1</th>
       <td>131933</td>
       <td>130.0</td>
-      <td>p12</td>
+      <td>9</td>
     </tr>
     <tr>
       <th>2</th>
       <td>149766</td>
       <td>100.0</td>
-      <td>p12</td>
+      <td>9</td>
     </tr>
     <tr>
       <th>3</th>
       <td>162933</td>
       <td>130.0</td>
-      <td>p12</td>
+      <td>9</td>
     </tr>
     <tr>
       <th>4</th>
       <td>217800</td>
       <td>100.0</td>
-      <td>p12</td>
+      <td>9</td>
     </tr>
   </tbody>
 </table>
@@ -805,112 +823,112 @@ X-axis: lag index (0 to 1 min, Fs = 30Hz)</p>
       <td>-0.058245</td>
       <td>4739.166667</td>
       <td>47.556309</td>
-      <td>p10</td>
+      <td>8</td>
     </tr>
     <tr>
       <th>1</th>
       <td>-0.037667</td>
       <td>4309.883721</td>
       <td>45.126086</td>
-      <td>p12</td>
+      <td>9</td>
     </tr>
     <tr>
       <th>2</th>
       <td>0.042847</td>
       <td>4868.750000</td>
       <td>49.910073</td>
-      <td>p13</td>
+      <td>10</td>
     </tr>
     <tr>
       <th>3</th>
       <td>-0.182514</td>
       <td>2575.000000</td>
       <td>33.046305</td>
-      <td>p15</td>
+      <td>11</td>
     </tr>
     <tr>
       <th>4</th>
       <td>0.240929</td>
       <td>2970.967742</td>
       <td>43.546121</td>
-      <td>p17</td>
+      <td>12</td>
     </tr>
     <tr>
       <th>5</th>
       <td>0.205085</td>
       <td>2337.096774</td>
       <td>38.247434</td>
-      <td>p19</td>
+      <td>13</td>
     </tr>
     <tr>
       <th>6</th>
       <td>0.079935</td>
       <td>2387.777778</td>
       <td>36.376685</td>
-      <td>p2</td>
+      <td>1</td>
     </tr>
     <tr>
       <th>7</th>
       <td>-0.060902</td>
       <td>3267.307692</td>
       <td>39.285613</td>
-      <td>p20</td>
+      <td>14</td>
     </tr>
     <tr>
       <th>8</th>
       <td>-0.079603</td>
       <td>2957.500000</td>
       <td>37.608064</td>
-      <td>p22</td>
+      <td>15</td>
     </tr>
     <tr>
       <th>9</th>
       <td>0.009257</td>
       <td>3268.243243</td>
       <td>40.209157</td>
-      <td>p23</td>
+      <td>16</td>
     </tr>
     <tr>
       <th>10</th>
       <td>-0.032880</td>
       <td>3156.875000</td>
       <td>38.628326</td>
-      <td>p4</td>
+      <td>2</td>
     </tr>
     <tr>
       <th>11</th>
       <td>-0.202814</td>
       <td>5553.260870</td>
       <td>47.484921</td>
-      <td>p5</td>
+      <td>3</td>
     </tr>
     <tr>
       <th>12</th>
       <td>-0.005982</td>
       <td>2858.333333</td>
       <td>37.872801</td>
-      <td>p6</td>
+      <td>4</td>
     </tr>
     <tr>
       <th>13</th>
       <td>-0.091160</td>
       <td>5023.076923</td>
       <td>47.378793</td>
-      <td>p7</td>
+      <td>5</td>
     </tr>
     <tr>
       <th>14</th>
       <td>0.077677</td>
       <td>1895.714286</td>
       <td>32.055062</td>
-      <td>p8</td>
+      <td>6</td>
     </tr>
     <tr>
       <th>15</th>
       <td>-0.221163</td>
       <td>4615.425532</td>
       <td>43.078049</td>
-      <td>p9</td>
+      <td>7</td>
     </tr>
   </tbody>
 </table>
@@ -925,30 +943,26 @@ X-axis: lag index (0 to 1 min, Fs = 30Hz)</p>
 </div>
 <div class="cell_output docutils container">
 <div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
-<span class="ne">TypeError</span><span class="g g-Whitespace">                                 </span>Traceback (most recent call last)
-<span class="o">/</span><span class="n">var</span><span class="o">/</span><span class="n">folders</span><span class="o">/</span><span class="n">bl</span><span class="o">/</span><span class="mi">2</span><span class="n">tw1vrc12mv_hqpbdf1j3wkw0000gn</span><span class="o">/</span><span class="n">T</span><span class="o">/</span><span class="n">ipykernel_60916</span><span class="o">/</span><span class="mf">1448172652.</span><span class="n">py</span> <span class="ow">in</span> <span class="o">&lt;</span><span class="n">module</span><span class="o">&gt;</span>
+<span class="ne">ValueError</span><span class="g g-Whitespace">                                </span>Traceback (most recent call last)
+<span class="o">/</span><span class="n">var</span><span class="o">/</span><span class="n">folders</span><span class="o">/</span><span class="n">bl</span><span class="o">/</span><span class="mi">2</span><span class="n">tw1vrc12mv_hqpbdf1j3wkw0000gn</span><span class="o">/</span><span class="n">T</span><span class="o">/</span><span class="n">ipykernel_89323</span><span class="o">/</span><span class="mf">1448172652.</span><span class="n">py</span> <span class="ow">in</span> <span class="o">&lt;</span><span class="n">module</span><span class="o">&gt;</span>
 <span class="ne">----&gt; </span><span class="mi">1</span> <span class="n">max_</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">*</span><span class="mf">1.2</span> <span class="k">if</span>  <span class="n">x</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="n">x</span><span class="o">*</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">X_ed</span><span class="o">.</span><span class="n">max</span><span class="p">()),</span> <span class="p">[</span><span class="s1">&#39;Inertia&#39;</span><span class="p">,</span> <span class="s1">&#39;Instability&#39;</span><span class="p">,</span> <span class="s1">&#39;Variability&#39;</span><span class="p">])</span>
 <span class="g g-Whitespace">      </span><span class="mi">2</span> <span class="n">min_</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">*</span><span class="mf">1.2</span> <span class="k">if</span>  <span class="n">x</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="n">x</span><span class="o">*</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">X_ed</span><span class="o">.</span><span class="n">min</span><span class="p">()),</span> <span class="p">[</span><span class="s1">&#39;Inertia&#39;</span><span class="p">,</span> <span class="s1">&#39;Instability&#39;</span><span class="p">,</span> <span class="s1">&#39;Variability&#39;</span><span class="p">])</span>
 
 <span class="nn">~/.virtualenvs/cpsc554x/lib/python3.9/site-packages/pandas/core/series.py</span> in <span class="ni">__init__</span><span class="nt">(self, data, index, dtype, name, copy, fastpath)</span>
-<span class="g g-Whitespace">    </span><span class="mi">421</span>                 <span class="k">pass</span>
-<span class="g g-Whitespace">    </span><span class="mi">422</span>             <span class="k">else</span><span class="p">:</span>
-<span class="ne">--&gt; </span><span class="mi">423</span>                 <span class="n">data</span> <span class="o">=</span> <span class="n">com</span><span class="o">.</span><span class="n">maybe_iterable_to_list</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">424</span> 
-<span class="g g-Whitespace">    </span><span class="mi">425</span>             <span class="k">if</span> <span class="n">index</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+<span class="g g-Whitespace">    </span><span class="mi">428</span>                 <span class="n">index</span> <span class="o">=</span> <span class="n">ibase</span><span class="o">.</span><span class="n">default_index</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">))</span>
+<span class="g g-Whitespace">    </span><span class="mi">429</span>             <span class="k">elif</span> <span class="n">is_list_like</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+<span class="ne">--&gt; </span><span class="mi">430</span>                 <span class="n">com</span><span class="o">.</span><span class="n">require_length_match</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">index</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">431</span> 
+<span class="g g-Whitespace">    </span><span class="mi">432</span>             <span class="c1"># create/copy the manager</span>
 
-<span class="nn">~/.virtualenvs/cpsc554x/lib/python3.9/site-packages/pandas/core/common.py</span> in <span class="ni">maybe_iterable_to_list</span><span class="nt">(obj)</span>
-<span class="g g-Whitespace">    </span><span class="mi">290</span>     <span class="s2">&quot;&quot;&quot;</span>
-<span class="g g-Whitespace">    </span><span class="mi">291</span><span class="s2">     if isinstance(obj, abc.Iterable) and not isinstance(obj, abc.Sized):</span>
-<span class="ne">--&gt; </span><span class="mi">292</span><span class="s2">         return list(obj)</span>
-<span class="g g-Whitespace">    </span><span class="mi">293</span><span class="s2">     obj = cast(Collection, obj)</span>
-<span class="g g-Whitespace">    </span><span class="mi">294</span><span class="s2">     return obj</span>
+<span class="nn">~/.virtualenvs/cpsc554x/lib/python3.9/site-packages/pandas/core/common.py</span> in <span class="ni">require_length_match</span><span class="nt">(data, index)</span>
+<span class="g g-Whitespace">    </span><span class="mi">529</span>     <span class="s2">&quot;&quot;&quot;</span>
+<span class="g g-Whitespace">    </span><span class="mi">530</span><span class="s2">     if len(data) != len(index):</span>
+<span class="ne">--&gt; </span><span class="mi">531</span><span class="s2">         raise ValueError(</span>
+<span class="g g-Whitespace">    </span><span class="mi">532</span><span class="s2">             &quot;Length of values &quot;</span>
+<span class="g g-Whitespace">    </span><span class="mi">533</span><span class="s2">             f&quot;({len(data)}) &quot;</span>
 
-<span class="nn">/var/folders/bl/2tw1vrc12mv_hqpbdf1j3wkw0000gn/T/ipykernel_60916/1448172652.py</span> in <span class="ni">&lt;lambda&gt;</span><span class="nt">(x)</span>
-<span class="ne">----&gt; </span><span class="mi">1</span><span class="s2"> max_ = pd.Series(map(lambda x: x*1.2 if  x &gt; 0 else x*0.8, X_ed.max()), [&#39;Inertia&#39;, &#39;Instability&#39;, &#39;Variability&#39;])</span>
-<span class="g g-Whitespace">      </span><span class="mi">2</span><span class="s2"> min_ = pd.Series(map(lambda x: x*1.2 if  x &lt; 0 else x*0.8, X_ed.min()), [&#39;Inertia&#39;, &#39;Instability&#39;, &#39;Variability&#39;])</span>
-
-<span class="ne">TypeError</span>: &#39;&gt;&#39; not supported between instances of &#39;str&#39; and &#39;int&#39;
+<span class="ne">ValueError</span>: Length of values (4) does not match length of index (3)
 </pre></div>
 </div>
 </div>
@@ -985,7 +999,7 @@ X-axis: lag index (0 to 1 min, Fs = 30Hz)</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="_images/calibrated-words_33_0.png" src="_images/calibrated-words_33_0.png" />
+<img alt="_images/calibrated-words_34_0.png" src="_images/calibrated-words_34_0.png" />
 </div>
 </div>
 </div>
@@ -1108,7 +1122,7 @@ X-axis: lag index (0 to 1 min, Fs = 30Hz)</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="_images/calibrated-words_38_0.png" src="_images/calibrated-words_38_0.png" />
+<img alt="_images/calibrated-words_39_0.png" src="_images/calibrated-words_39_0.png" />
 </div>
 </div>
 </div>
@@ -1140,7 +1154,7 @@ X-axis: lag index (0 to 1 min, Fs = 30Hz)</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="_images/calibrated-words_40_0.png" src="_images/calibrated-words_40_0.png" />
+<img alt="_images/calibrated-words_41_0.png" src="_images/calibrated-words_41_0.png" />
 </div>
 </div>
 </div>
@@ -1213,7 +1227,7 @@ X-axis: lag index (0 to 1 min, Fs = 30Hz)</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="_images/calibrated-words_44_0.png" src="_images/calibrated-words_44_0.png" />
+<img alt="_images/calibrated-words_45_0.png" src="_images/calibrated-words_45_0.png" />
 </div>
 </div>
 <div class="cell docutils container">
@@ -1251,7 +1265,7 @@ X-axis: lag index (0 to 1 min, Fs = 30Hz)</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="_images/calibrated-words_45_0.png" src="_images/calibrated-words_45_0.png" />
+<img alt="_images/calibrated-words_46_0.png" src="_images/calibrated-words_46_0.png" />
 </div>
 </div>
 </div>
@@ -1398,22 +1412,22 @@ X-axis: lag index (0 to 1 min, Fs = 30Hz)</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="_images/calibrated-words_53_0.png" src="_images/calibrated-words_53_0.png" />
-<img alt="_images/calibrated-words_53_1.png" src="_images/calibrated-words_53_1.png" />
-<img alt="_images/calibrated-words_53_2.png" src="_images/calibrated-words_53_2.png" />
-<img alt="_images/calibrated-words_53_3.png" src="_images/calibrated-words_53_3.png" />
-<img alt="_images/calibrated-words_53_4.png" src="_images/calibrated-words_53_4.png" />
-<img alt="_images/calibrated-words_53_5.png" src="_images/calibrated-words_53_5.png" />
-<img alt="_images/calibrated-words_53_6.png" src="_images/calibrated-words_53_6.png" />
-<img alt="_images/calibrated-words_53_7.png" src="_images/calibrated-words_53_7.png" />
-<img alt="_images/calibrated-words_53_8.png" src="_images/calibrated-words_53_8.png" />
-<img alt="_images/calibrated-words_53_9.png" src="_images/calibrated-words_53_9.png" />
-<img alt="_images/calibrated-words_53_10.png" src="_images/calibrated-words_53_10.png" />
-<img alt="_images/calibrated-words_53_11.png" src="_images/calibrated-words_53_11.png" />
-<img alt="_images/calibrated-words_53_12.png" src="_images/calibrated-words_53_12.png" />
-<img alt="_images/calibrated-words_53_13.png" src="_images/calibrated-words_53_13.png" />
-<img alt="_images/calibrated-words_53_14.png" src="_images/calibrated-words_53_14.png" />
-<img alt="_images/calibrated-words_53_15.png" src="_images/calibrated-words_53_15.png" />
+<img alt="_images/calibrated-words_54_0.png" src="_images/calibrated-words_54_0.png" />
+<img alt="_images/calibrated-words_54_1.png" src="_images/calibrated-words_54_1.png" />
+<img alt="_images/calibrated-words_54_2.png" src="_images/calibrated-words_54_2.png" />
+<img alt="_images/calibrated-words_54_3.png" src="_images/calibrated-words_54_3.png" />
+<img alt="_images/calibrated-words_54_4.png" src="_images/calibrated-words_54_4.png" />
+<img alt="_images/calibrated-words_54_5.png" src="_images/calibrated-words_54_5.png" />
+<img alt="_images/calibrated-words_54_6.png" src="_images/calibrated-words_54_6.png" />
+<img alt="_images/calibrated-words_54_7.png" src="_images/calibrated-words_54_7.png" />
+<img alt="_images/calibrated-words_54_8.png" src="_images/calibrated-words_54_8.png" />
+<img alt="_images/calibrated-words_54_9.png" src="_images/calibrated-words_54_9.png" />
+<img alt="_images/calibrated-words_54_10.png" src="_images/calibrated-words_54_10.png" />
+<img alt="_images/calibrated-words_54_11.png" src="_images/calibrated-words_54_11.png" />
+<img alt="_images/calibrated-words_54_12.png" src="_images/calibrated-words_54_12.png" />
+<img alt="_images/calibrated-words_54_13.png" src="_images/calibrated-words_54_13.png" />
+<img alt="_images/calibrated-words_54_14.png" src="_images/calibrated-words_54_14.png" />
+<img alt="_images/calibrated-words_54_15.png" src="_images/calibrated-words_54_15.png" />
 </div>
 </div>
 </div>

@@ -136,27 +136,34 @@ p10_feeltrace.Feeltrace = scale(p10_feeltrace.Feeltrace)
 # In[10]:
 
 
-p10_words.Timestamps.count()/(p10_words.Timestamps.iloc[-1]*1e-3)
+def sampling_frequency(df):
+    return df.Timestamps.count()/(df.Timestamps.iloc[-1]*1e-3)
 
 
 # In[11]:
 
 
-p10_feeltrace.Timestamps.count()/(p10_feeltrace.Timestamps.iloc[-1]*1e-3)
+f'Fs Interview ~ %.2f Hz' % sampling_frequency(p10_words)
+
+
+# In[12]:
+
+
+f'Fs Feeltrace ~ %.2f Hz' % sampling_frequency(p10_feeltrace)
 
 
 # Here, I attempt downsampling the feeltrace using aggregation strategies. I am using windows corresponding to midpoints in between sampled words. For instance, if the first interview word is recorded at $t=10$s and the next word is recorded at $t=15$s, the first window corresponds to $t=0$s to $t=12.5$s.
 # 
 # We can calculate windows using a rolling average on the interview timestamps.
 
-# In[12]:
+# In[13]:
 
 
 timestamps = p10_words.Timestamps.rolling(2).mean().dropna().reset_index(drop=True)
 timestamps.head()
 
 
-# In[13]:
+# In[14]:
 
 
 plt.figure(figsize=(15,10))
@@ -167,7 +174,7 @@ for x in timestamps:
     plt.axvline(x, c='k', alpha=0.2, linestyle='dashed')
 
 
-# In[14]:
+# In[15]:
 
 
 plt.figure(figsize=(15,10))
@@ -178,7 +185,7 @@ for x in timestamps:
     plt.axvline(x, c='k', alpha=0.2, linestyle='dashed')
 
 
-# In[15]:
+# In[16]:
 
 
 from statsmodels.graphics.tsaplots import plot_acf
@@ -188,7 +195,7 @@ plot_acf(p10_words['Values'], lags=range(len(p10_words)))
 plt.ylim([-1.1, 1.1]);
 
 
-# In[16]:
+# In[17]:
 
 
 plt.rc('figure', figsize=(15,10))
@@ -198,7 +205,7 @@ plt.ylim([-1.1, 1.1]);
 
 # Extract indexes in the feeltrace by looking at the nearest timestamp that matches our window start points:
 
-# In[17]:
+# In[18]:
 
 
 idxs = []
@@ -214,7 +221,7 @@ print(f'Indexes: %s' % idxs)
 
 # Timestamps for the new feeltrace are defined as the mean timestamp of the window ((window start + window end) / 2):
 
-# In[18]:
+# In[19]:
 
 
 feeltrace_timestamps = list(p10_feeltrace.loc[idxs, 'Timestamps'].rolling(2).mean().reset_index(drop=True))
@@ -230,7 +237,7 @@ feeltrace_timestamps = pd.Series(feeltrace_timestamps)
 print(f'Timestamps (ms): %s' % feeltrace_timestamps.head())
 
 
-# In[19]:
+# In[20]:
 
 
 # make sure both series are the same length
@@ -243,7 +250,7 @@ assert(len(feeltrace_timestamps) == len(p10_words.Timestamps))
 
 # #### Aggregating by taking the mean
 
-# In[20]:
+# In[21]:
 
 
 p10_feeltrace_agg_mean = pd.DataFrame()
@@ -267,13 +274,13 @@ p10_feeltrace_agg_mean['Timestamps'] = feeltrace_timestamps
 p10_feeltrace_agg_mean['Feeltrace'] = mean_feeltrace
 
 
-# In[21]:
+# In[22]:
 
 
 p10_feeltrace_agg_mean.head()
 
 
-# In[22]:
+# In[23]:
 
 
 plt.figure(figsize=(15,10))
@@ -289,7 +296,7 @@ for x in timestamps:
 
 # Checking autocorelation on aggregated data:
 
-# In[23]:
+# In[24]:
 
 
 plt.rc('figure', figsize=(15,10))
@@ -306,7 +313,7 @@ plt.ylim([-1.1, 1.1]);
 # 
 # Tried a few attemps, settling for taking first and last value of window:
 
-# In[24]:
+# In[25]:
 
 
 def change_direction(x, y):
@@ -338,7 +345,7 @@ def change_direction(x, y):
 
 # Calculating for feeltrace:
 
-# In[25]:
+# In[26]:
 
 
 p10_feeltrace_agg_slope = pd.DataFrame()
@@ -365,7 +372,7 @@ p10_feeltrace_agg_slope.head()
 
 # Also calculating the slope values based on the aggregated feeltrace data:
 
-# In[26]:
+# In[27]:
 
 
 p10_feeltrace_agg_mean_slope = pd.DataFrame()
@@ -384,7 +391,7 @@ p10_feeltrace_agg_mean_slope.head()
 
 # Taking the slopes for interview words:
 
-# In[27]:
+# In[28]:
 
 
 p10_words_agg_slope = pd.DataFrame()
@@ -401,7 +408,7 @@ p10_words_agg_slope['Timestamps'] = timestamps
 p10_words_agg_slope.head()
 
 
-# In[28]:
+# In[29]:
 
 
 fig, axes = plt.subplots(2, 2, figsize=(25,10))
@@ -428,7 +435,7 @@ for x in timestamps:
 
 # To proceed with analysis, I will be comparing the transitions captured by word labels and by the aggregated feeltrace values.
 
-# In[29]:
+# In[30]:
 
 
 p10_agg_data = pd.DataFrame()
@@ -441,7 +448,7 @@ p10_agg_data.head()
 
 # Checking autocorelation on aggregated data:
 
-# In[30]:
+# In[31]:
 
 
 plt.rc('figure', figsize=(15,10))
@@ -449,7 +456,7 @@ plot_acf(p10_words_agg_slope['Values'], lags=range(len(p10_words_agg_slope)))
 plt.ylim([-1.1, 1.1]);
 
 
-# In[31]:
+# In[32]:
 
 
 plt.rc('figure', figsize=(15,10))
@@ -469,7 +476,7 @@ plt.ylim([-1.1, 1.1]);
 # 
 # *(potentially a causality relationship, although this might be too strong of a claim, see `Limitations` section below)
 
-# In[32]:
+# In[33]:
 
 
 from statsmodels.tsa.stattools import grangercausalitytests
@@ -525,7 +532,7 @@ while True:
 
 # #### Cointegration
 
-# In[33]:
+# In[34]:
 
 
 #-----------------------------------------
@@ -549,7 +556,7 @@ while True:
 
 from statsmodels.tsa.vector_ar.vecm import coint_johansen
 
-def cointegration_test(df, alpha=0.05): 
+def cointegration_test(df, alpha=0.05, verbose=False): 
     """Perform Johanson's Cointegration Test and Report Summary"""
     out = coint_johansen(df,-1,5)
     d = {'0.90':0, '0.95':1, '0.99':2}
@@ -560,9 +567,11 @@ def cointegration_test(df, alpha=0.05):
     results = []
 
     # Summary
-    print('Name   ::  Test Stat > C(95%)    =>   Signif  \n', '--'*20)
+    if verbose:
+        print('Name   ::  Test Stat > C(95%)    =>   Signif  \n', '--'*20)
     for col, trace, cvt in zip(df.columns, traces, cvts):
-        print(adjust(col), ':: ', adjust(round(trace,2), 9), ">", adjust(cvt, 8), ' =>  ' , trace > cvt)
+        if verbose:
+            print(adjust(col), ':: ', adjust(round(trace,2), 9), ">", adjust(cvt, 8), ' =>  ' , trace > cvt)
         results.append({col: [trace, cvt, trace > cvt]})
         
     return results
@@ -572,7 +581,7 @@ cointegration_test(p10_agg_data[['Words', 'Feeltrace']])
 
 # #### Stationarity
 
-# In[34]:
+# In[35]:
 
 
 from statsmodels.tsa.stattools import adfuller
@@ -595,22 +604,25 @@ def adfuller_test(series, signif=0.05, name='', verbose=False):
     p_value = output['pvalue'] 
     def adjust(val, length= 6): return str(val).ljust(length)
 
-    # Print Summary
-    print(f'    Augmented Dickey-Fuller Test on "{name}"', "\n   ", '-'*47)
-    print(f' Null Hypothesis: Data has unit root. Non-Stationary.')
-    print(f' Significance Level    = {signif}')
-    print(f' Test Statistic        = {output["test_statistic"]}')
-    print(f' No. Lags Chosen       = {output["n_lags"]}')
+    if verbose:
+        # Print Summary
+        print(f'    Augmented Dickey-Fuller Test on "{name}"', "\n   ", '-'*47)
+        print(f' Null Hypothesis: Data has unit root. Non-Stationary.')
+        print(f' Significance Level    = {signif}')
+        print(f' Test Statistic        = {output["test_statistic"]}')
+        print(f' No. Lags Chosen       = {output["n_lags"]}')
 
-    for key,val in r[4].items():
-        print(f' Critical value {adjust(key)} = {round(val, 3)}')
+        for key,val in r[4].items():
+            print(f' Critical value {adjust(key)} = {round(val, 3)}')
 
-    if p_value <= signif:
-        print(f" => P-Value = {p_value}. Rejecting Null Hypothesis.")
-        print(f" => Series is Stationary.")
-    else:
-        print(f" => P-Value = {p_value}. Weak evidence to reject the Null Hypothesis.")
-        print(f" => Series is Non-Stationary.")  
+        if p_value <= signif:
+            print(f" => P-Value = {p_value}. Rejecting Null Hypothesis.")
+            print(f" => Series is Stationary.")
+        else:
+            print(f" => P-Value = {p_value}. Weak evidence to reject the Null Hypothesis.")
+            print(f" => Series is Non-Stationary.")
+    
+    return output
         
  # ADF Test on each column
 for name, column in p10_agg_data.iteritems():
@@ -631,7 +643,7 @@ for name, column in diff.iteritems():
 
 # #### Pearson's correlation
 
-# In[35]:
+# In[36]:
 
 
 p10_agg_data[['Words', 'Feeltrace']].corr()
@@ -641,7 +653,7 @@ p10_agg_data[['Words', 'Feeltrace']].corr()
 
 # ##### Training and validation data
 
-# In[36]:
+# In[37]:
 
 
 # The VAR model will be fitted on df_train and then used to forecast the next 4 
@@ -659,7 +671,7 @@ print(df_test.shape)  # (4, 8)
 
 # ##### Fitting
 
-# In[37]:
+# In[38]:
 
 
 #---------------------------------------
@@ -681,7 +693,7 @@ for i in [1,2,3,4,5, 6, 7]:
     print('HQIC: ', result.hqic, '\n')
 
 
-# In[38]:
+# In[39]:
 
 
 # In the above output, the AIC drops to lowest at lag 4, then increases at 
@@ -695,7 +707,7 @@ x = model.select_order(maxlags=7)
 x.summary()
 
 
-# In[39]:
+# In[40]:
 
 
 #----------------------------------
@@ -708,7 +720,7 @@ model_fitted.summary()
 
 # ##### Check for remaining serial correlation
 
-# In[40]:
+# In[41]:
 
 
 # Serial correlation of residuals is used to check if there is any leftover pattern 
@@ -738,7 +750,7 @@ for col, val in zip(p10_agg_data[['Words', 'Feeltrace']].columns, out):
 
 # ##### Forecasting
 
-# In[41]:
+# In[42]:
 
 
 #--------------------------------------
@@ -765,7 +777,7 @@ df_forecast = pd.DataFrame(fc, index=p10_agg_data[['Words', 'Feeltrace']].index[
 df_forecast
 
 
-# In[42]:
+# In[43]:
 
 
 # The forecasts are generated but it is on the scale of the training data used by 
@@ -810,7 +822,7 @@ plt.tight_layout();
 
 # ##### Accuracy
 
-# In[43]:
+# In[44]:
 
 
 from statsmodels.tsa.stattools import acf
@@ -841,7 +853,7 @@ for k, v in accuracy_prod.items():
     print(k, ': ', round(v,4))
 
 
-# In[44]:
+# In[45]:
 
 
 model_fitted.coefs
@@ -849,107 +861,401 @@ model_fitted.coefs
 
 # ## All participants
 
-# In[ ]:
-
-
-
-
-
-# ### Downsampling the continuous annotation
-
-# Before time series analysis can be performed, we must downsample the feeltrace to match the sample size of the interview words (or upsample the interview words):
-# - $\text{Fs}_{\text{feeltrace}} = 30$Hz
-# - $\text{Fs}_{\text{calibrated words}} \approx 0.05$Hz
-
-# In[45]:
+# In[46]:
 
 
 def scale(X, min_=0, max_=200):
     return (X - min_)/(max_ - min_)
 
 
-# In[46]:
+# In[47]:
 
+
+def prepare_data(words, feeltrace):
+    p_words = words.copy()
+    p_feeltrace = feeltrace.copy()
+
+    p_words.Values = scale(p_words.Values)
+    p_words.p_number = p_num_map[p_words.p_number[0]]
+
+    p_feeltrace.Feeltrace = scale(p_feeltrace.Feeltrace)
+    p_feeltrace.p_number = p_num_map[p_feeltrace.p_number[0]]
+        
+    return p_words, p_feeltrace
+
+
+# In[48]:
+
+
+def get_indexes(feeltrace, words):
+    idxs = []
+    timestamps = words.Timestamps.rolling(2).mean().dropna().reset_index(drop=True)    
+
+    for timestamp in timestamps:
+        arr = feeltrace.Timestamps.to_numpy().astype(int)
+        dist = (arr - timestamp)**2
+        idx = tuple(np.argwhere(dist == np.min(dist))[0])
+        idxs.append(idx[0])
+        
+    return idxs, timestamps
+
+
+def get_feeltrace_timestamps(feeltrace, idxs):
+    feeltrace_timestamps = list(feeltrace.loc[idxs, 'Timestamps'].rolling(2).mean().reset_index(drop=True))
+
+    # add first timestamp
+    feeltrace_timestamps[0] = feeltrace.loc[idxs[0], 'Timestamps'] / 2
+
+    # add last timestamp
+    feeltrace_timestamps.append((feeltrace.Timestamps.iloc[-1] + feeltrace.loc[idxs[-1], 'Timestamps']) / 2)
+
+    feeltrace_timestamps = pd.Series(feeltrace_timestamps)
+    
+    return feeltrace_timestamps
+
+
+# In[49]:
+
+
+def aggregate_mean(feeltrace, idxs):
+    feeltrace_agg_mean = pd.DataFrame()
+
+    mean_feeltrace = []
+
+    # first window
+    mean_feeltrace.append(feeltrace.Feeltrace.loc[:idxs[0]].mean())
+
+    # middle windows
+    for (prev_idx, idx) in zip(idxs[:-1], idxs[1:]):
+        mean_feeltrace.append(feeltrace.Feeltrace.loc[prev_idx:idx].mean())
+
+    # last window
+    mean_feeltrace.append(feeltrace.Feeltrace.loc[idxs[-1]:].mean())
+
+    # make sure both feeltrace and interview series are the same size
+    assert(len(mean_feeltrace) == len(p_words.Values))
+
+    feeltrace_agg_mean['Timestamps'] = feeltrace_timestamps
+    feeltrace_agg_mean['Feeltrace'] = mean_feeltrace
+    
+    return feeltrace_agg_mean
+
+def aggregate_slope(feeltrace, idxs):
+    feeltrace_agg_slope = pd.DataFrame()
+
+    slope_feeltrace = []
+
+    # first window
+    slope_feeltrace.append(change_direction(feeltrace.Feeltrace[:idxs[0]], feeltrace.Timestamps[:idxs[0]]))
+
+    # middle windows
+    for (prev_idx, idx) in zip(idxs[:-1], idxs[1:]):
+        slope_feeltrace.append(change_direction(feeltrace.Feeltrace.loc[prev_idx:idx], feeltrace.Timestamps.loc[prev_idx:idx]))
+
+    # last window
+    slope_feeltrace.append(change_direction(feeltrace.Feeltrace.loc[idxs[-1]:], feeltrace.Timestamps.loc[idxs[-1]:]))
+
+    feeltrace_agg_slope['Timestamps'] = feeltrace_timestamps
+    feeltrace_agg_slope['Feeltrace'] = slope_feeltrace
+    feeltrace_agg_slope.head()
+    
+    return feeltrace_agg_slope
+
+
+# Renaming participants:
+
+# In[50]:
+
+
+p_num_map = {'2': 1, '4': 2, '5': 3, '6': 4, 
+             '7': 5, '8': 6, '9': 7, '10': 8, 
+             '12': 9, '13': 10, '15': 11, '17': 12, 
+             '19': 13, '20': 14, '22': 15, '23': 16}
+
+
+# ### States
+
+# In[51]:
+
+
+from scipy.stats.stats import pearsonr
 
 n_windows = []
+fs = []
 granger_p_values = []
+stationarity = []
 cointegration_p_values = []
 pearsons_corr = []
 var_models = []
 
 for (p_words, p_feeltrace) in zip(words_list, feeltrace_list):
-    p_words = p_words.copy()
-    p_feeltrace = p_feeltrace.copy()
-
-    p_words.Values = scale(p_words.Values)
-    p_feeltrace.Feeltrace = scale(p_feeltrace.Feeltrace)
+    [p_words, p_feeltrace] = prepare_data(p_words, p_feeltrace)
     
-    timestamps = p_words.Timestamps.rolling(2).mean().dropna().reset_index(drop=True)
-    timestamps.head()
+    fs.append({'Words': sampling_frequency(p_words), 
+               'Feeltrace': sampling_frequency(p_feeltrace),
+               'p_number': p_feeltrace.p_number[0]
+              })
     
-    idxs = []
-
-    for timestamp in timestamps:
-        arr = p_feeltrace.Timestamps.to_numpy().astype(int)
-        dist = (arr - timestamp)**2
-        idx = tuple(np.argwhere(dist == np.min(dist))[0])
-        idxs.append(idx[0])
+    [idxs, timestamps] = get_indexes(p_feeltrace, p_words)
+    feeltrace_timestamps = get_feeltrace_timestamps(p_feeltrace, idxs)
     
-    feeltrace_timestamps = list(p_feeltrace.loc[idxs, 'Timestamps'].rolling(2).mean().reset_index(drop=True))
-
-    # add first timestamp
-    feeltrace_timestamps[0] = p_feeltrace.loc[idxs[0], 'Timestamps'] / 2
-
-    # add last timestamp
-    feeltrace_timestamps.append((p_feeltrace.Timestamps.iloc[-1] + p_feeltrace.loc[idxs[-1], 'Timestamps']) / 2)
-
-    feeltrace_timestamps = pd.Series(feeltrace_timestamps)
-    
-    # make sure both series are the same length
+    # make sure both timestamps are the same length
     assert(len(feeltrace_timestamps) == len(p_words.Timestamps))
     
     n_windows.append({'p_number': p_words.p_number[0], 'n_windows': len(feeltrace_timestamps)})
     
-    p_feeltrace_agg_mean = pd.DataFrame()
-
-    mean_feeltrace = []
-
-    # first window
-    mean_feeltrace.append(p_feeltrace.Feeltrace.loc[:idxs[0]].mean())
-
-    # middle windows
-    for (prev_idx, idx) in zip(idxs[:-1], idxs[1:]):
-        mean_feeltrace.append(p_feeltrace.Feeltrace.loc[prev_idx:idx].mean())
-
-    # last window
-    mean_feeltrace.append(p_feeltrace.Feeltrace.loc[idxs[-1]:].mean())
-
-    # make sure both feeltrace and interview series are the same size
-    assert(len(mean_feeltrace) == len(p_words.Values))
-
-    p_feeltrace_agg_mean['Timestamps'] = feeltrace_timestamps
-    p_feeltrace_agg_mean['Feeltrace'] = mean_feeltrace
+    p_feeltrace_agg_mean = aggregate_mean(p_feeltrace, idxs)
     
-    p_feeltrace_agg_slope = pd.DataFrame()
-
-    slope_feeltrace = []
-
-    # first window
-    slope_feeltrace.append(change_direction(p_feeltrace.Feeltrace[:idxs[0]], p_feeltrace.Timestamps[:idxs[0]]))
-
-    # middle windows
-    for (prev_idx, idx) in zip(idxs[:-1], idxs[1:]):
-        slope_feeltrace.append(change_direction(p_feeltrace.Feeltrace.loc[prev_idx:idx], p_feeltrace.Timestamps.loc[prev_idx:idx]))
-
-    # last window
-    slope_feeltrace.append(change_direction(p_feeltrace.Feeltrace.loc[idxs[-1]:], p_feeltrace.Timestamps.loc[idxs[-1]:]))
-
     # make sure both feeltrace and interview series are the same size
-    assert(len(slope_feeltrace) == len(p_words.Values))
+    assert(len(p_feeltrace_agg_mean.Feeltrace) == len(p_words.Values))
+    
+    p_agg_data = pd.DataFrame()
+    p_agg_data['Timestamps'] = p_words['Timestamps'].copy()
+    p_agg_data['Words'] = p_words['Values'].copy()
+    p_agg_data['Feeltrace'] = p_feeltrace_agg_mean['Feeltrace'].copy()
+    
+    maxlag = 1
+    
+    # transitions
+    while True:
+        try:
+            grangers_causation_matrix(p_agg_data[['Words', 'Feeltrace']], variables = p_agg_data[['Words', 'Feeltrace']].columns) 
+            maxlag+=1
+        except ValueError:
+            maxlag-=1
+            granger_p_values.append(grangers_causation_matrix(p_agg_data[['Words', 'Feeltrace']], variables = p_agg_data[['Words', 'Feeltrace']].columns))
+            break
+            
+    stationarity.append({'p_number': p_feeltrace.p_number[0],
+                         'Words': adfuller_test(p_agg_data['Words']), 
+                         'Feeltrace': adfuller_test(p_agg_data['Feeltrace'])
+                        })
+    cointegration_p_values.append(cointegration_test(p_agg_data[['Words', 'Feeltrace']]))
+    pearsons_corr.append(pearsonr(p_agg_data['Words'],p_agg_data['Feeltrace']))
+    
+    # The VAR model will be fitted on df_train and then used to forecast the next 4 
+    # observations. These forecasts will be compared against the actuals present in 
+    # test data.
 
-    p_feeltrace_agg_slope['Timestamps'] = feeltrace_timestamps
-    p_feeltrace_agg_slope['Feeltrace'] = slope_feeltrace
-    p_feeltrace_agg_slope.head()
+
+    nobs = 4
+    df_train, df_test = p_agg_data[0:-nobs], p_agg_data[-nobs:]
+
+    # Check size
+    model = VAR(df_train[['Words', 'Feeltrace']])
+
+    maxlag = 1
+
+    while True:
+        try:
+            x = model.select_order(maxlags=maxlag)
+            maxlag+=1
+        except ValueError:
+            maxlag-=1
+            x = model.select_order(maxlags=maxlag)
+            model_fitted = model.fit(maxlag)
+            break
+
+    var_models.append([x, model_fitted])
+
+
+# In[52]:
+
+
+n_windows = pd.DataFrame(n_windows)
+
+
+# For the following secionts, I perform multiple comparisons using Bonferroni-Holm correction:
+# 
+# ```
+# from statsmodels.stats.multitest import multipletests
+# rejected, p_adjusted, _, alpha_corrected = multipletests(raw_pvals, alpha=alpha, 
+#                                method='bonferroni', is_sorted=False, returnsorted=False)
+# np.sum(rejected)
+# # 2
+# alpha_corrected 
+# # 0.0005
+# 
+# ```
+
+# #### Granger Causality
+# 
+# TODO: calculate power / effect size
+
+# In[53]:
+
+
+words_to_feeltrace = []
+feeltrace_to_words = []
+for value in granger_p_values:
+    words_to_feeltrace.append(value.Words_x.Feeltrace_y)
+    feeltrace_to_words.append(value.Feeltrace_x.Words_y)
+
+
+# In[54]:
+
+
+from statsmodels.stats.multitest import multipletests
+rejected, p_adjusted, _, alpha_corrected = multipletests(words_to_feeltrace, alpha=0.05, 
+                                                         method='holm', 
+                                                         is_sorted=False, returnsorted=False)
+print(f'Rejected H0: %d' % np.sum(rejected))
+print(f'Corrected alpha: %f' % alpha_corrected)
+
+sns.kdeplot(words_to_feeltrace, color="red", shade=True, label='raw')
+ax = sns.kdeplot(p_adjusted, color="green", shade=True, label='adujusted')
+ax.set(xlim=(0, 1))
+plt.title('Distribution of p-values')
+plt.legend();
+
+
+# In[55]:
+
+
+n_windows.loc[p_adjusted < 0.05, 'p_number']
+
+
+# In[56]:
+
+
+n_windows.loc[p_adjusted >= 0.05, 'p_number']
+
+
+# In[57]:
+
+
+from statsmodels.stats.multitest import multipletests
+rejected, p_adjusted, _, alpha_corrected = multipletests(feeltrace_to_words, alpha=0.05, 
+                                                         method='holm', 
+                                                         is_sorted=False, returnsorted=False)
+print(f'Rejected H0: %d' % np.sum(rejected))
+print(f'Corrected alpha: %f' % alpha_corrected)
+
+sns.kdeplot(feeltrace_to_words, color="red", shade=True, label='raw')
+ax = sns.kdeplot(p_adjusted, color="green", shade=True, label='adujusted')
+ax.set(xlim=(0, 1))
+plt.title('Distribution of p-values')
+plt.legend();
+
+
+# In[58]:
+
+
+n_windows.loc[p_adjusted < 0.05, 'p_number']
+
+
+# In[59]:
+
+
+n_windows.loc[p_adjusted >= 0.05, 'p_number']
+
+
+# #### Cointegration
+# TODO: summarize
+
+# In[60]:
+
+
+cointegration_p_values # not p-values, different test statistic
+
+
+# #### Pearson's correlation
+
+# In[61]:
+
+
+pearsons_corr
+
+
+# In[62]:
+
+
+pearsons_corr_values = [x[0] for x in pearsons_corr]
+pearsons_corr_p_values = [x[1] for x in pearsons_corr]
+
+
+# In[63]:
+
+
+sns.kdeplot(pearsons_corr_values, color="red", shade=True, label='rho')
+plt.title('Distribution of correlation values')
+plt.legend();
+
+
+# In[64]:
+
+
+rejected, p_adjusted, _, alpha_corrected = multipletests(pearsons_corr_p_values, alpha=0.05, 
+                                                         method='holm', 
+                                                         is_sorted=False, returnsorted=False)
+print(f'Rejected H0: %d' % np.sum(rejected))
+print(f'Corrected alpha: %f' % alpha_corrected)
+
+sns.kdeplot(feeltrace_to_words, color="red", shade=True, label='raw')
+ax = sns.kdeplot(p_adjusted, color="green", shade=True, label='adujusted')
+ax.set(xlim=(0, 1))
+plt.title('Distribution of p-values')
+plt.legend();
+
+
+# In[65]:
+
+
+n_windows.loc[p_adjusted < 0.05, 'p_number']
+
+
+# In[66]:
+
+
+n_windows.loc[p_adjusted >= 0.05, 'p_number']
+
+
+# #### VAR Model
+# 
+# TODO: 
+# - Summarize VAR model results
+# - Cluster using VAR coefficients
+
+# ### Transitions
+
+# In[67]:
+
+
+from scipy.stats.stats import pearsonr
+
+n_windows = []
+fs = []
+granger_p_values = []
+stationarity = []
+cointegration_p_values = []
+pearsons_corr = []
+var_models = []
+
+for (p_words, p_feeltrace) in zip(words_list, feeltrace_list):
+    [p_words, p_feeltrace] = prepare_data(p_words, p_feeltrace)
+    
+    fs.append({'Words': sampling_frequency(p_words), 
+               'Feeltrace': sampling_frequency(p_feeltrace),
+               'p_number': p_feeltrace.p_number[0]
+              })
+    
+    [idxs, timestamps] = get_indexes(p_feeltrace, p_words)
+    feeltrace_timestamps = get_feeltrace_timestamps(p_feeltrace, idxs)
+    
+    # make sure both timestamps are the same length
+    assert(len(feeltrace_timestamps) == len(p_words.Timestamps))
+    
+    n_windows.append({'p_number': p_words.p_number[0], 'n_windows': len(feeltrace_timestamps)})
+    
+    p_feeltrace_agg_mean = aggregate_mean(p_feeltrace, idxs)
+    
+    # make sure both feeltrace and interview series are the same size
+    assert(len(p_feeltrace_agg_mean.Feeltrace) == len(p_words.Values))
+    
+    p_feeltrace_agg_slope = aggregate_slope(p_feeltrace, idxs)
+    
+    # make sure both feeltrace and interview series are the same size
+    assert(len(p_feeltrace_agg_slope.Feeltrace) == len(p_words.Values))
     
     p_feeltrace_agg_mean_slope = pd.DataFrame()
 
@@ -984,6 +1290,7 @@ for (p_words, p_feeltrace) in zip(words_list, feeltrace_list):
     
     maxlag = 1
     
+    # transitions
     while True:
         try:
             grangers_causation_matrix(p_agg_data[['Words', 'Feeltrace']], variables = p_agg_data[['Words', 'Feeltrace']].columns) 
@@ -993,8 +1300,12 @@ for (p_words, p_feeltrace) in zip(words_list, feeltrace_list):
             granger_p_values.append(grangers_causation_matrix(p_agg_data[['Words', 'Feeltrace']], variables = p_agg_data[['Words', 'Feeltrace']].columns))
             break
             
+    stationarity.append({'p_number': p_feeltrace.p_number[0],
+                         'Words': adfuller_test(p_agg_data['Words']), 
+                         'Feeltrace': adfuller_test(p_agg_data['Feeltrace'])
+                        })
     cointegration_p_values.append(cointegration_test(p_agg_data[['Words', 'Feeltrace']]))
-    pearsons_corr.append(p_agg_data[['Words', 'Feeltrace']].corr())
+    pearsons_corr.append(pearsonr(p_agg_data['Words'],p_agg_data['Feeltrace']))
     
     # The VAR model will be fitted on df_train and then used to forecast the next 4 
     # observations. These forecasts will be compared against the actuals present in 
@@ -1024,14 +1335,14 @@ for (p_words, p_feeltrace) in zip(words_list, feeltrace_list):
 
 # The number of windows corresponds to the number of words each participant used:
 
-# In[47]:
+# In[68]:
 
 
 n_windows = pd.DataFrame(n_windows)
 n_windows['n_windows'].describe()
 
 
-# In[48]:
+# In[69]:
 
 
 plt.figure(figsize=(5,7));
@@ -1040,42 +1351,153 @@ plt.ylabel('# of windows');
 plt.axhline(n_windows['n_windows'].mean(), c='k', alpha=0.2, linestyle='dashed');
 
 
+# In[70]:
+
+
+fs = pd.DataFrame(fs)
+fs.describe()
+
+
+# In[71]:
+
+
+fs_long = fs.melt('p_number', var_name='Pass', value_name='Fs')
+
+
+# In[72]:
+
+
+plt.figure(figsize=(5,7));
+sns.boxplot(data=fs, y='Words');
+
+
+# In[73]:
+
+
+plt.figure(figsize=(5,7));
+sns.boxplot(data=fs, y='Feeltrace');
+
+
 # All results in the next sections are ordered according to p_number:
 
-# In[49]:
+# In[74]:
 
 
 n_windows
 
 
-# ### Granger Causality
+# #### Granger Causality
 # 
-# TODO: summarize
+# TODO: calculate power / effect size
 
-# In[50]:
+# In[75]:
 
 
+words_to_feeltrace = []
+feeltrace_to_words = []
 for value in granger_p_values:
-    print(value < 0.05)
+    words_to_feeltrace.append(value.Words_x.Feeltrace_y)
+    feeltrace_to_words.append(value.Feeltrace_x.Words_y)
 
 
-# ### Cointegration
+# In[76]:
+
+
+from statsmodels.stats.multitest import multipletests
+rejected, p_adjusted, _, alpha_corrected = multipletests(words_to_feeltrace, alpha=0.05, 
+                                                         method='holm', 
+                                                         is_sorted=False, returnsorted=False)
+print(f'Rejected H0: %d' % np.sum(rejected))
+print(f'Corrected alpha: %f' % alpha_corrected)
+
+sns.kdeplot(words_to_feeltrace, color="red", shade=True, label='raw')
+ax = sns.kdeplot(p_adjusted, color="green", shade=True, label='adujusted')
+ax.set(xlim=(0, 1))
+plt.title('Distribution of p-values')
+plt.legend();
+
+
+# In[77]:
+
+
+from statsmodels.stats.multitest import multipletests
+rejected, p_adjusted, _, alpha_corrected = multipletests(feeltrace_to_words, alpha=0.05, 
+                                                         method='holm', 
+                                                         is_sorted=False, returnsorted=False)
+print(f'Rejected H0: %d' % np.sum(rejected))
+print(f'Corrected alpha: %f' % alpha_corrected)
+
+sns.kdeplot(feeltrace_to_words, color="red", shade=True, label='raw')
+ax = sns.kdeplot(p_adjusted, color="green", shade=True, label='adujusted')
+ax.set(xlim=(0, 1))
+plt.title('Distribution of p-values')
+plt.legend();
+
+
+# In[78]:
+
+
+n_windows.loc[p_adjusted < 0.05, 'p_number']
+
+
+# In[79]:
+
+
+n_windows.loc[p_adjusted >= 0.05, 'p_number']
+
+
+# #### Cointegration
 # TODO: summarize
 
-# In[51]:
+# In[80]:
 
 
 cointegration_p_values
 
 
-# ### Pearson's correlation
-# 
-# TODO: calculate significance
+# #### Pearson's correlation
 
-# In[52]:
+# In[81]:
 
 
-pearsons_corr
+pearsons_corr_values = [x[0] for x in pearsons_corr]
+pearsons_corr_p_values = [x[1] for x in pearsons_corr]
+
+
+# In[82]:
+
+
+sns.kdeplot(pearsons_corr_values, color="red", shade=True, label='rho')
+plt.title('Distribution of correlation values')
+plt.legend();
+
+
+# In[83]:
+
+
+rejected, p_adjusted, _, alpha_corrected = multipletests(pearsons_corr_p_values, alpha=0.05, 
+                                                         method='holm', 
+                                                         is_sorted=False, returnsorted=False)
+print(f'Rejected H0: %d' % np.sum(rejected))
+print(f'Corrected alpha: %f' % alpha_corrected)
+
+sns.kdeplot(feeltrace_to_words, color="red", shade=True, label='raw')
+ax = sns.kdeplot(p_adjusted, color="green", shade=True, label='adujusted')
+ax.set(xlim=(0, 1))
+plt.title('Distribution of p-values')
+plt.legend();
+
+
+# In[84]:
+
+
+n_windows.loc[p_adjusted < 0.05, 'p_number']
+
+
+# In[85]:
+
+
+n_windows.loc[p_adjusted >= 0.05, 'p_number']
 
 
 # #### VAR Model
@@ -1094,7 +1516,7 @@ pearsons_corr
 # - **Emotional instability:** refers to the magnitude of emotional changes from one moment to the next. An individual characterized by high levels of instability experiences larger emotional shifts from one moment to the next, resulting in a more unstable emotional life.
 # - **Emotional variability:** refers to the range or amplitude of someone’s emotional states across time. An individual characterized by higher levels of emotional variability experiences emotions that reach more extreme levels and shows larger emotional deviations from his or her average emotional level
 
-# In[53]:
+# In[86]:
 
 
 class EmotionDynamics:
@@ -1121,14 +1543,14 @@ class EmotionDynamics:
         return parameters
 
 
-# In[54]:
+# In[87]:
 
 
 ED = EmotionDynamics(Fs=0.05)
 ED.get_parameters(p10_words['Values'])
 
 
-# In[55]:
+# In[88]:
 
 
 words_data = []
@@ -1142,7 +1564,7 @@ words_data = pd.DataFrame(words_data)
 words_data.head()
 
 
-# In[56]:
+# In[89]:
 
 
 ED = EmotionDynamics(Fs=30)
@@ -1158,7 +1580,7 @@ feeltrace_data = pd.DataFrame(feeltrace_data)
 feeltrace_data.head()
 
 
-# In[57]:
+# In[90]:
 
 
 X = pd.concat([words_data, feeltrace_data]).reset_index(drop=True)
@@ -1168,14 +1590,14 @@ X
 # ### Data preprocessing: scaling
 # Standardize features by removing the mean and scaling to unit variance.
 
-# In[58]:
+# In[91]:
 
 
 from sklearn.preprocessing import StandardScaler
 scaler = StandardScaler()
 
 
-# In[59]:
+# In[92]:
 
 
 X_feeltrace = scaler.fit_transform(feeltrace_data[['Inertia', 'Instability', 'Variability']])
@@ -1185,7 +1607,7 @@ X_feeltrace['pass'] = feeltrace_data['pass']
 X_feeltrace
 
 
-# In[60]:
+# In[93]:
 
 
 X_words = scaler.fit_transform(words_data[['Inertia', 'Instability', 'Variability']])
@@ -1195,7 +1617,7 @@ X_words['pass'] = words_data['pass']
 X_words
 
 
-# In[61]:
+# In[94]:
 
 
 X_scaled = pd.concat([X_words, X_feeltrace]).reset_index(drop=True)
@@ -1203,13 +1625,13 @@ X_scaled = pd.concat([X_words, X_feeltrace]).reset_index(drop=True)
 
 # ### Pairplot analysis
 
-# In[62]:
+# In[95]:
 
 
 sns.pairplot(X_scaled, hue='pass');
 
 
-# In[63]:
+# In[96]:
 
 
 abs(X_feeltrace[['Inertia', 'Instability', 'Variability']] - X_words[['Inertia', 'Instability', 'Variability']])
@@ -1219,7 +1641,7 @@ abs(X_feeltrace[['Inertia', 'Instability', 'Variability']] - X_words[['Inertia',
 
 # TODO: color according to labelling pass
 
-# In[64]:
+# In[97]:
 
 
 import numpy as np
@@ -1247,7 +1669,7 @@ plt.show()
 
 # ### Principal Component Analysis
 
-# In[65]:
+# In[98]:
 
 
 import numpy as np
@@ -1268,7 +1690,7 @@ for i, (_, subject) in enumerate(X_scaled.iterrows()): #plot each point + it's i
     color='k') 
 
 
-# In[66]:
+# In[99]:
 
 
 X_PCA = pd.DataFrame(X_PCA, columns=['PC1', 'PC2'])
@@ -1277,7 +1699,7 @@ X_PCA['pass'] = X_scaled['pass']
 X_PCA.head()
 
 
-# In[67]:
+# In[100]:
 
 
 # TODO: fix colors
@@ -1293,12 +1715,12 @@ for subject in X_PCA.groupby('p_number'):
     pass_distance.append({'p_number': subject.p_number.iloc[0], 'Distance': distance.euclidean(subject_interview, subject_feeltrace)})
 
 pass_distance = pd.DataFrame(pass_distance)
-sns.barplot(data=pass_distance, x='p_number', y='Distance');
+sns.boxplot(data=pass_distance, y='Distance');
 
 
 # ### Repeated Measures Analysis
 
-# In[68]:
+# In[101]:
 
 
 X_scaled.pivot(columns='pass').to_csv('scaled_ed_per_pass.csv', index=False)
@@ -1308,7 +1730,7 @@ X_scaled.pivot(columns='pass').to_csv('scaled_ed_per_pass.csv', index=False)
 
 # ### Gaussian Mixture Model
 
-# In[69]:
+# In[102]:
 
 
 """
@@ -1377,7 +1799,7 @@ spl.set_xlabel("Number of components")
 spl.legend([b[0] for b in bars], cv_types);
 
 
-# In[70]:
+# In[103]:
 
 
 # TODO: Fix legend
@@ -1411,16 +1833,4 @@ plt.title(
 
 
 plt.show()
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
 

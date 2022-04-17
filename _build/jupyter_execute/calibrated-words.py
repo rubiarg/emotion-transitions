@@ -46,7 +46,8 @@ def load_dataset(data_dir = '../EEG/data/p*'):
         df_data = list(zip(timestamp_data, subject_data))        
         df = pd.DataFrame(df_data, columns=['Timestamp', 'Values'])
 
-        p_number = re.findall('p\d+', subject_filename) * df.shape[0]
+        p_number = [p_num_map[re.findall('p\d+', subject_filename)[0]]] * df.shape[0]
+        
         df['p_number'] = p_number
         subjects_data.append(df)
     
@@ -56,16 +57,25 @@ def load_dataset(data_dir = '../EEG/data/p*'):
 # In[3]:
 
 
-X_list = load_dataset()
+p_num_map = {'p2': 1, 'p4': 2, 'p5': 3, 'p6': 4, 
+             'p7': 5, 'p8': 6, 'p9': 7, 'p10': 8, 
+             'p12': 9, 'p13': 10, 'p15': 11, 'p17': 12, 
+             'p19': 13, 'p20': 14, 'p22': 15, 'p23': 16}
 
 
 # In[4]:
 
 
-X_list[0].head()
+X_list = load_dataset()
 
 
 # In[5]:
+
+
+X_list[0].head()
+
+
+# In[6]:
 
 
 X = pd.concat(X_list)
@@ -76,13 +86,13 @@ X.head()
 
 # ### Boxplot
 
-# In[6]:
+# In[7]:
 
 
 ax = X.boxplot(column='Values', by='p_number', rot=45, figsize=(15,10));
 
 
-# In[7]:
+# In[8]:
 
 
 def plot_all_word_values(X, num_columns, figsize_per_row=None):
@@ -105,7 +115,7 @@ def plot_all_word_values(X, num_columns, figsize_per_row=None):
         pass
 
 
-# In[8]:
+# In[9]:
 
 
 plot_all_word_values(X, 3)
@@ -117,19 +127,19 @@ plot_all_word_values(X, 3)
 # - Based on the plots below, there seems to be no strong effects of autocorrelation.
 # - Idea: we could use the last significant lag (e.g. the last lag above 0.2, but have to define this threshold) as a measure for "reaction time" in the continuous annotation pass. In other words, the strong autocorrelation for small lags suggest that the participant takes some time processing their emotions and generating an annotation.
 
-# In[9]:
+# In[10]:
 
 
 from statsmodels.graphics.tsaplots import plot_acf
 
-def plot_autocorr(X, num_columns, lags=None, figsize_per_row=None):
+def plot_autocorr(X, num_columns, lags=None, figsize_per_row=None, savefig=True, filename="plot_autocorr.png"):
     X_by_participant = iter(X.groupby('p_number'))
     if figsize_per_row is None:
         figsize_per_row = (25, 15/num_columns)
     try:
         while True:
-            fig = plt.figure(figsize=figsize_per_row)
-            fig.subplots_adjust(hspace=0.4, wspace=0.4)
+            fig = plt.figure(figsize=figsize_per_row);
+            fig.subplots_adjust(hspace=0.4, wspace=0.1);
             for col in range(num_columns):
                 pnum = next(X_by_participant)
                 series  = pnum[1].Values
@@ -138,6 +148,8 @@ def plot_autocorr(X, num_columns, lags=None, figsize_per_row=None):
                 ax = fig.add_subplot(1, num_columns, col+1)
                 plot_acf(series, ax=ax, lags=lags, title=pnum[0], zero=False) # autocorr for all lags < 1 min
                 plt.ylim([-1.15,1.15])
+                if savefig:
+                    fig.savefig(filename);
     except StopIteration:
         pass
 
@@ -147,10 +159,10 @@ def plot_autocorr(X, num_columns, lags=None, figsize_per_row=None):
 # Y-axis: Correlation coefficient (-1 to 1)
 # X-axis: lag index (0 to 1 min, Fs = 30Hz)
 
-# In[10]:
+# In[11]:
 
 
-plot_autocorr(X, 3)
+plot_autocorr(X, 2);
 
 
 # #### Note on ACF confidence intervals
@@ -175,7 +187,7 @@ plot_autocorr(X, 3)
 # - **Emotional instability:** refers to the magnitude of emotional changes from one moment to the next. An individual characterized by high levels of instability experiences larger emotional shifts from one moment to the next, resulting in a more unstable emotional life.
 # - **Emotional variability:** refers to the range or amplitude of someone’s emotional states across time. An individual characterized by higher levels of emotional variability experiences emotions that reach more extreme levels and shows larger emotional deviations from his or her average emotional level
 
-# In[11]:
+# In[12]:
 
 
 from statsmodels.tsa import stattools
@@ -208,25 +220,25 @@ class EmotionDynamics:
         return parameters
 
 
-# In[12]:
+# In[13]:
 
 
 ED = EmotionDynamics(Fs=0.05)
 
 
-# In[13]:
+# In[14]:
 
 
 ED.get_parameters(X_list[1]['Values'])
 
 
-# In[14]:
+# In[15]:
 
 
 X_list[1].head()
 
 
-# In[15]:
+# In[16]:
 
 
 X_ed = []
@@ -237,14 +249,14 @@ for subject in X_list:
     X_ed.append(ed)
 
 
-# In[16]:
+# In[17]:
 
 
 X_ed = pd.DataFrame(X_ed)
 X_ed
 
 
-# In[17]:
+# In[18]:
 
 
 max_ = pd.Series(map(lambda x: x*1.2 if  x > 0 else x*0.8, X_ed.max()), ['Inertia', 'Instability', 'Variability'])

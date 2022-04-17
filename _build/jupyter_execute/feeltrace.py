@@ -122,7 +122,7 @@ def plot_autocorr(X, num_columns, lags, figsize_per_row=None):
     try:
         while True:
             fig = plt.figure(figsize=figsize_per_row)
-            fig.subplots_adjust(hspace=0.4, wspace=0.4)
+            fig.subplots_adjust(hspace=0.4, wspace=0.1)
             for col in range(num_columns):
                 pnum = next(X_by_participant)
                 series  = pnum[1].Feeltrace
@@ -143,7 +143,7 @@ def plot_autocorr(X, num_columns, lags, figsize_per_row=None):
 # In[10]:
 
 
-plot_autocorr(X, 3, np.arange(30*1*60))
+plot_autocorr(X, 2, np.arange(30*1*60))
 
 
 # #### Closer look on lags up to 2 seconds
@@ -151,7 +151,7 @@ plot_autocorr(X, 3, np.arange(30*1*60))
 # In[11]:
 
 
-plot_autocorr(X, 3, np.arange(30*2))
+plot_autocorr(X, 2, np.arange(30*2))
 
 
 # #### Note on ACF confidence intervals
