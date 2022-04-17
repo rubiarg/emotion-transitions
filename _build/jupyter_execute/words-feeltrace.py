@@ -1420,6 +1420,18 @@ plt.legend();
 # In[77]:
 
 
+n_windows.loc[p_adjusted < 0.05, 'p_number']
+
+
+# In[78]:
+
+
+n_windows.loc[p_adjusted >= 0.05, 'p_number']
+
+
+# In[79]:
+
+
 from statsmodels.stats.multitest import multipletests
 rejected, p_adjusted, _, alpha_corrected = multipletests(feeltrace_to_words, alpha=0.05, 
                                                          method='holm', 
@@ -1434,13 +1446,13 @@ plt.title('Distribution of p-values')
 plt.legend();
 
 
-# In[78]:
+# In[80]:
 
 
 n_windows.loc[p_adjusted < 0.05, 'p_number']
 
 
-# In[79]:
+# In[81]:
 
 
 n_windows.loc[p_adjusted >= 0.05, 'p_number']
@@ -1449,7 +1461,7 @@ n_windows.loc[p_adjusted >= 0.05, 'p_number']
 # #### Cointegration
 # TODO: summarize
 
-# In[80]:
+# In[82]:
 
 
 cointegration_p_values
@@ -1457,14 +1469,14 @@ cointegration_p_values
 
 # #### Pearson's correlation
 
-# In[81]:
+# In[83]:
 
 
 pearsons_corr_values = [x[0] for x in pearsons_corr]
 pearsons_corr_p_values = [x[1] for x in pearsons_corr]
 
 
-# In[82]:
+# In[84]:
 
 
 sns.kdeplot(pearsons_corr_values, color="red", shade=True, label='rho')
@@ -1472,7 +1484,7 @@ plt.title('Distribution of correlation values')
 plt.legend();
 
 
-# In[83]:
+# In[85]:
 
 
 rejected, p_adjusted, _, alpha_corrected = multipletests(pearsons_corr_p_values, alpha=0.05, 
@@ -1488,13 +1500,13 @@ plt.title('Distribution of p-values')
 plt.legend();
 
 
-# In[84]:
+# In[86]:
 
 
 n_windows.loc[p_adjusted < 0.05, 'p_number']
 
 
-# In[85]:
+# In[87]:
 
 
 n_windows.loc[p_adjusted >= 0.05, 'p_number']
@@ -1516,7 +1528,7 @@ n_windows.loc[p_adjusted >= 0.05, 'p_number']
 # - **Emotional instability:** refers to the magnitude of emotional changes from one moment to the next. An individual characterized by high levels of instability experiences larger emotional shifts from one moment to the next, resulting in a more unstable emotional life.
 # - **Emotional variability:** refers to the range or amplitude of someone’s emotional states across time. An individual characterized by higher levels of emotional variability experiences emotions that reach more extreme levels and shows larger emotional deviations from his or her average emotional level
 
-# In[86]:
+# In[88]:
 
 
 class EmotionDynamics:
@@ -1543,14 +1555,14 @@ class EmotionDynamics:
         return parameters
 
 
-# In[87]:
+# In[89]:
 
 
 ED = EmotionDynamics(Fs=0.05)
 ED.get_parameters(p10_words['Values'])
 
 
-# In[88]:
+# In[90]:
 
 
 words_data = []
@@ -1564,7 +1576,7 @@ words_data = pd.DataFrame(words_data)
 words_data.head()
 
 
-# In[89]:
+# In[91]:
 
 
 ED = EmotionDynamics(Fs=30)
@@ -1580,7 +1592,7 @@ feeltrace_data = pd.DataFrame(feeltrace_data)
 feeltrace_data.head()
 
 
-# In[90]:
+# In[92]:
 
 
 X = pd.concat([words_data, feeltrace_data]).reset_index(drop=True)
@@ -1590,14 +1602,14 @@ X
 # ### Data preprocessing: scaling
 # Standardize features by removing the mean and scaling to unit variance.
 
-# In[91]:
+# In[93]:
 
 
 from sklearn.preprocessing import StandardScaler
 scaler = StandardScaler()
 
 
-# In[92]:
+# In[94]:
 
 
 X_feeltrace = scaler.fit_transform(feeltrace_data[['Inertia', 'Instability', 'Variability']])
@@ -1607,7 +1619,7 @@ X_feeltrace['pass'] = feeltrace_data['pass']
 X_feeltrace
 
 
-# In[93]:
+# In[95]:
 
 
 X_words = scaler.fit_transform(words_data[['Inertia', 'Instability', 'Variability']])
@@ -1617,7 +1629,7 @@ X_words['pass'] = words_data['pass']
 X_words
 
 
-# In[94]:
+# In[96]:
 
 
 X_scaled = pd.concat([X_words, X_feeltrace]).reset_index(drop=True)
@@ -1625,13 +1637,13 @@ X_scaled = pd.concat([X_words, X_feeltrace]).reset_index(drop=True)
 
 # ### Pairplot analysis
 
-# In[95]:
+# In[97]:
 
 
 sns.pairplot(X_scaled, hue='pass');
 
 
-# In[96]:
+# In[98]:
 
 
 abs(X_feeltrace[['Inertia', 'Instability', 'Variability']] - X_words[['Inertia', 'Instability', 'Variability']])
@@ -1641,7 +1653,7 @@ abs(X_feeltrace[['Inertia', 'Instability', 'Variability']] - X_words[['Inertia',
 
 # TODO: color according to labelling pass
 
-# In[97]:
+# In[99]:
 
 
 import numpy as np
@@ -1669,7 +1681,7 @@ plt.show()
 
 # ### Principal Component Analysis
 
-# In[98]:
+# In[100]:
 
 
 import numpy as np
@@ -1690,7 +1702,7 @@ for i, (_, subject) in enumerate(X_scaled.iterrows()): #plot each point + it's i
     color='k') 
 
 
-# In[99]:
+# In[101]:
 
 
 X_PCA = pd.DataFrame(X_PCA, columns=['PC1', 'PC2'])
@@ -1699,7 +1711,7 @@ X_PCA['pass'] = X_scaled['pass']
 X_PCA.head()
 
 
-# In[100]:
+# In[102]:
 
 
 # TODO: fix colors
@@ -1720,7 +1732,7 @@ sns.boxplot(data=pass_distance, y='Distance');
 
 # ### Repeated Measures Analysis
 
-# In[101]:
+# In[103]:
 
 
 X_scaled.pivot(columns='pass').to_csv('scaled_ed_per_pass.csv', index=False)
@@ -1730,7 +1742,7 @@ X_scaled.pivot(columns='pass').to_csv('scaled_ed_per_pass.csv', index=False)
 
 # ### Gaussian Mixture Model
 
-# In[102]:
+# In[104]:
 
 
 """
@@ -1799,7 +1811,7 @@ spl.set_xlabel("Number of components")
 spl.legend([b[0] for b in bars], cv_types);
 
 
-# In[103]:
+# In[105]:
 
 
 # TODO: Fix legend

@@ -1779,7 +1779,7 @@ HQIC:  -3.831213665944237
 Model:                         VAR
 Method:                        OLS
 Date:           Sun, 17, Apr, 2022
-Time:                     10:09:48
+Time:                     10:12:50
 --------------------------------------------------------------------
 No. of Equations:         2.00000    BIC:                   -2.55188
 Nobs:                     18.0000    HQIC:                  -3.83121
@@ -2056,11 +2056,11 @@ corr :  0.502
 minmax :  inf
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/var/folders/bl/2tw1vrc12mv_hqpbdf1j3wkw0000gn/T/ipykernel_89397/1231121430.py:11: FutureWarning: Support for multi-dimensional indexing (e.g. `obj[:, None]`) is deprecated and will be removed in a future version.  Convert to a numpy array before indexing instead.
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/var/folders/bl/2tw1vrc12mv_hqpbdf1j3wkw0000gn/T/ipykernel_89635/1231121430.py:11: FutureWarning: Support for multi-dimensional indexing (e.g. `obj[:, None]`) is deprecated and will be removed in a future version.  Convert to a numpy array before indexing instead.
   actual[:,None]]), axis=1)
-/var/folders/bl/2tw1vrc12mv_hqpbdf1j3wkw0000gn/T/ipykernel_89397/1231121430.py:13: FutureWarning: Support for multi-dimensional indexing (e.g. `obj[:, None]`) is deprecated and will be removed in a future version.  Convert to a numpy array before indexing instead.
+/var/folders/bl/2tw1vrc12mv_hqpbdf1j3wkw0000gn/T/ipykernel_89635/1231121430.py:13: FutureWarning: Support for multi-dimensional indexing (e.g. `obj[:, None]`) is deprecated and will be removed in a future version.  Convert to a numpy array before indexing instead.
   actual[:,None]]), axis=1)
-/var/folders/bl/2tw1vrc12mv_hqpbdf1j3wkw0000gn/T/ipykernel_89397/1231121430.py:14: RuntimeWarning: divide by zero encountered in true_divide
+/var/folders/bl/2tw1vrc12mv_hqpbdf1j3wkw0000gn/T/ipykernel_89635/1231121430.py:14: RuntimeWarning: divide by zero encountered in true_divide
   minmax = 1 - np.mean(mins/maxs)             # minmax
 </pre></div>
 </div>
@@ -3077,6 +3077,46 @@ Corrected alpha: 0.003125
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">n_windows</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">p_adjusted</span> <span class="o">&lt;</span> <span class="mf">0.05</span><span class="p">,</span> <span class="s1">&#39;p_number&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0      8
+1      9
+4     12
+6      1
+9     16
+11     3
+12     4
+14     6
+Name: p_number, dtype: int64
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">n_windows</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">p_adjusted</span> <span class="o">&gt;=</span> <span class="mf">0.05</span><span class="p">,</span> <span class="s1">&#39;p_number&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>2     10
+3     11
+5     13
+7     14
+8     15
+10     2
+13     5
+15     7
+Name: p_number, dtype: int64
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">statsmodels.stats.multitest</span> <span class="kn">import</span> <span class="n">multipletests</span>
 <span class="n">rejected</span><span class="p">,</span> <span class="n">p_adjusted</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">alpha_corrected</span> <span class="o">=</span> <span class="n">multipletests</span><span class="p">(</span><span class="n">feeltrace_to_words</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span> 
                                                          <span class="n">method</span><span class="o">=</span><span class="s1">&#39;holm&#39;</span><span class="p">,</span> 
@@ -3097,7 +3137,7 @@ Corrected alpha: 0.003125
 Corrected alpha: 0.003125
 </pre></div>
 </div>
-<img alt="_images/words-feeltrace_122_1.png" src="_images/words-feeltrace_122_1.png" />
+<img alt="_images/words-feeltrace_124_1.png" src="_images/words-feeltrace_124_1.png" />
 </div>
 </div>
 <div class="cell docutils container">
@@ -3207,7 +3247,7 @@ Name: p_number, dtype: int64
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="_images/words-feeltrace_129_0.png" src="_images/words-feeltrace_129_0.png" />
+<img alt="_images/words-feeltrace_131_0.png" src="_images/words-feeltrace_131_0.png" />
 </div>
 </div>
 <div class="cell docutils container">
@@ -3231,7 +3271,7 @@ Name: p_number, dtype: int64
 Corrected alpha: 0.003125
 </pre></div>
 </div>
-<img alt="_images/words-feeltrace_130_1.png" src="_images/words-feeltrace_130_1.png" />
+<img alt="_images/words-feeltrace_132_1.png" src="_images/words-feeltrace_132_1.png" />
 </div>
 </div>
 <div class="cell docutils container">
@@ -4171,7 +4211,7 @@ Name: p_number, dtype: int64
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="_images/words-feeltrace_147_0.png" src="_images/words-feeltrace_147_0.png" />
+<img alt="_images/words-feeltrace_149_0.png" src="_images/words-feeltrace_149_0.png" />
 </div>
 </div>
 <div class="cell docutils container">
@@ -4336,7 +4376,7 @@ Name: p_number, dtype: int64
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="_images/words-feeltrace_151_0.png" src="_images/words-feeltrace_151_0.png" />
+<img alt="_images/words-feeltrace_153_0.png" src="_images/words-feeltrace_153_0.png" />
 </div>
 </div>
 </div>
@@ -4364,7 +4404,7 @@ Name: p_number, dtype: int64
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="_images/words-feeltrace_153_0.png" src="_images/words-feeltrace_153_0.png" />
+<img alt="_images/words-feeltrace_155_0.png" src="_images/words-feeltrace_155_0.png" />
 </div>
 </div>
 <div class="cell docutils container">
@@ -4461,7 +4501,7 @@ Name: p_number, dtype: int64
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="_images/words-feeltrace_155_0.png" src="_images/words-feeltrace_155_0.png" />
+<img alt="_images/words-feeltrace_157_0.png" src="_images/words-feeltrace_157_0.png" />
 </div>
 </div>
 </div>
@@ -4548,7 +4588,7 @@ Name: p_number, dtype: int64
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="_images/words-feeltrace_160_0.png" src="_images/words-feeltrace_160_0.png" />
+<img alt="_images/words-feeltrace_162_0.png" src="_images/words-feeltrace_162_0.png" />
 </div>
 </div>
 <div class="cell docutils container">
@@ -4588,7 +4628,7 @@ Name: p_number, dtype: int64
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="_images/words-feeltrace_161_0.png" src="_images/words-feeltrace_161_0.png" />
+<img alt="_images/words-feeltrace_163_0.png" src="_images/words-feeltrace_163_0.png" />
 </div>
 </div>
 </div>
