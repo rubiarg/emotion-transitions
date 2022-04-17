@@ -322,27 +322,54 @@ const thebe_selector_output = ".output, .cell_output"
   </a>
   <ul class="nav section-nav flex-column">
    <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#id1">
-     Downsampling the continuous annotation
+    <a class="reference internal nav-link" href="#states">
+     States
     </a>
+    <ul class="nav section-nav flex-column">
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#id1">
+       Granger Causality
+      </a>
+     </li>
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#id2">
+       Cointegration
+      </a>
+     </li>
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#id3">
+       Pearson’s correlation
+      </a>
+     </li>
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#id4">
+       VAR Model
+      </a>
+     </li>
+    </ul>
    </li>
    <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#id2">
-     Granger Causality
-    </a>
-   </li>
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#id3">
-     Cointegration
-    </a>
-   </li>
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#id4">
-     Pearson’s correlation
+    <a class="reference internal nav-link" href="#transitions">
+     Transitions
     </a>
     <ul class="nav section-nav flex-column">
      <li class="toc-h4 nav-item toc-entry">
       <a class="reference internal nav-link" href="#id5">
+       Granger Causality
+      </a>
+     </li>
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#id6">
+       Cointegration
+      </a>
+     </li>
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#id7">
+       Pearson’s correlation
+      </a>
+     </li>
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#id8">
        VAR Model
       </a>
      </li>
@@ -668,24 +695,32 @@ const thebe_selector_output = ".output, .cell_output"
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">p10_words</span><span class="o">.</span><span class="n">Timestamps</span><span class="o">.</span><span class="n">count</span><span class="p">()</span><span class="o">/</span><span class="p">(</span><span class="n">p10_words</span><span class="o">.</span><span class="n">Timestamps</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="mf">1e-3</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0.040934900303710546
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">sampling_frequency</span><span class="p">(</span><span class="n">df</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">df</span><span class="o">.</span><span class="n">Timestamps</span><span class="o">.</span><span class="n">count</span><span class="p">()</span><span class="o">/</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">Timestamps</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="mf">1e-3</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">p10_feeltrace</span><span class="o">.</span><span class="n">Timestamps</span><span class="o">.</span><span class="n">count</span><span class="p">()</span><span class="o">/</span><span class="p">(</span><span class="n">p10_feeltrace</span><span class="o">.</span><span class="n">Timestamps</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="mf">1e-3</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="sa">f</span><span class="s1">&#39;Fs Interview ~ %.2f Hz&#39;</span> <span class="o">%</span> <span class="n">sampling_frequency</span><span class="p">(</span><span class="n">p10_words</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>29.64152332829802
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&#39;Fs Interview ~ 0.04 Hz&#39;
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="sa">f</span><span class="s1">&#39;Fs Feeltrace ~ %.2f Hz&#39;</span> <span class="o">%</span> <span class="n">sampling_frequency</span><span class="p">(</span><span class="n">p10_feeltrace</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&#39;Fs Feeltrace ~ 29.64 Hz&#39;
 </pre></div>
 </div>
 </div>
@@ -722,7 +757,7 @@ Name: Timestamps, dtype: float64
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="_images/words-feeltrace_20_0.png" src="_images/words-feeltrace_20_0.png" />
+<img alt="_images/words-feeltrace_21_0.png" src="_images/words-feeltrace_21_0.png" />
 </div>
 </div>
 <div class="cell docutils container">
@@ -737,7 +772,7 @@ Name: Timestamps, dtype: float64
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="_images/words-feeltrace_21_0.png" src="_images/words-feeltrace_21_0.png" />
+<img alt="_images/words-feeltrace_22_0.png" src="_images/words-feeltrace_22_0.png" />
 </div>
 </div>
 <div class="cell docutils container">
@@ -751,7 +786,7 @@ Name: Timestamps, dtype: float64
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="_images/words-feeltrace_22_0.png" src="_images/words-feeltrace_22_0.png" />
+<img alt="_images/words-feeltrace_23_0.png" src="_images/words-feeltrace_23_0.png" />
 </div>
 </div>
 <div class="cell docutils container">
@@ -763,7 +798,7 @@ Name: Timestamps, dtype: float64
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="_images/words-feeltrace_23_0.png" src="_images/words-feeltrace_23_0.png" />
+<img alt="_images/words-feeltrace_24_0.png" src="_images/words-feeltrace_24_0.png" />
 </div>
 </div>
 <p>Extract indexes in the feeltrace by looking at the nearest timestamp that matches our window start points:</p>
@@ -929,7 +964,7 @@ dtype: float64
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="_images/words-feeltrace_33_0.png" src="_images/words-feeltrace_33_0.png" />
+<img alt="_images/words-feeltrace_34_0.png" src="_images/words-feeltrace_34_0.png" />
 </div>
 </div>
 <p>Checking autocorelation on aggregated data:</p>
@@ -942,7 +977,7 @@ dtype: float64
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="_images/words-feeltrace_35_0.png" src="_images/words-feeltrace_35_0.png" />
+<img alt="_images/words-feeltrace_36_0.png" src="_images/words-feeltrace_36_0.png" />
 </div>
 </div>
 </div>
@@ -1233,7 +1268,7 @@ dtype: float64
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="_images/words-feeltrace_45_0.png" src="_images/words-feeltrace_45_0.png" />
+<img alt="_images/words-feeltrace_46_0.png" src="_images/words-feeltrace_46_0.png" />
 </div>
 </div>
 <p>To proceed with analysis, I will be comparing the transitions captured by word labels and by the aggregated feeltrace values.</p>
@@ -1317,7 +1352,7 @@ dtype: float64
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="_images/words-feeltrace_49_0.png" src="_images/words-feeltrace_49_0.png" />
+<img alt="_images/words-feeltrace_50_0.png" src="_images/words-feeltrace_50_0.png" />
 </div>
 </div>
 <div class="cell docutils container">
@@ -1329,7 +1364,7 @@ dtype: float64
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="_images/words-feeltrace_50_0.png" src="_images/words-feeltrace_50_0.png" />
+<img alt="_images/words-feeltrace_51_0.png" src="_images/words-feeltrace_51_0.png" />
 </div>
 </div>
 </div>
@@ -1431,7 +1466,7 @@ Y = Feeltrace, X = Feeltrace, P Values = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
 
 <span class="kn">from</span> <span class="nn">statsmodels.tsa.vector_ar.vecm</span> <span class="kn">import</span> <span class="n">coint_johansen</span>
 
-<span class="k">def</span> <span class="nf">cointegration_test</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.05</span><span class="p">):</span> 
+<span class="k">def</span> <span class="nf">cointegration_test</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span> 
     <span class="sd">&quot;&quot;&quot;Perform Johanson&#39;s Cointegration Test and Report Summary&quot;&quot;&quot;</span>
     <span class="n">out</span> <span class="o">=</span> <span class="n">coint_johansen</span><span class="p">(</span><span class="n">df</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">5</span><span class="p">)</span>
     <span class="n">d</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;0.90&#39;</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;0.95&#39;</span><span class="p">:</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;0.99&#39;</span><span class="p">:</span><span class="mi">2</span><span class="p">}</span>
@@ -1442,9 +1477,11 @@ Y = Feeltrace, X = Feeltrace, P Values = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
     <span class="n">results</span> <span class="o">=</span> <span class="p">[]</span>
 
     <span class="c1"># Summary</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Name   ::  Test Stat &gt; C(95%)    =&gt;   Signif  </span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;--&#39;</span><span class="o">*</span><span class="mi">20</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Name   ::  Test Stat &gt; C(95%)    =&gt;   Signif  </span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;--&#39;</span><span class="o">*</span><span class="mi">20</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">col</span><span class="p">,</span> <span class="n">trace</span><span class="p">,</span> <span class="n">cvt</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span> <span class="n">traces</span><span class="p">,</span> <span class="n">cvts</span><span class="p">):</span>
-        <span class="nb">print</span><span class="p">(</span><span class="n">adjust</span><span class="p">(</span><span class="n">col</span><span class="p">),</span> <span class="s1">&#39;:: &#39;</span><span class="p">,</span> <span class="n">adjust</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">trace</span><span class="p">,</span><span class="mi">2</span><span class="p">),</span> <span class="mi">9</span><span class="p">),</span> <span class="s2">&quot;&gt;&quot;</span><span class="p">,</span> <span class="n">adjust</span><span class="p">(</span><span class="n">cvt</span><span class="p">,</span> <span class="mi">8</span><span class="p">),</span> <span class="s1">&#39; =&gt;  &#39;</span> <span class="p">,</span> <span class="n">trace</span> <span class="o">&gt;</span> <span class="n">cvt</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">adjust</span><span class="p">(</span><span class="n">col</span><span class="p">),</span> <span class="s1">&#39;:: &#39;</span><span class="p">,</span> <span class="n">adjust</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">trace</span><span class="p">,</span><span class="mi">2</span><span class="p">),</span> <span class="mi">9</span><span class="p">),</span> <span class="s2">&quot;&gt;&quot;</span><span class="p">,</span> <span class="n">adjust</span><span class="p">(</span><span class="n">cvt</span><span class="p">,</span> <span class="mi">8</span><span class="p">),</span> <span class="s1">&#39; =&gt;  &#39;</span> <span class="p">,</span> <span class="n">trace</span> <span class="o">&gt;</span> <span class="n">cvt</span><span class="p">)</span>
         <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="n">col</span><span class="p">:</span> <span class="p">[</span><span class="n">trace</span><span class="p">,</span> <span class="n">cvt</span><span class="p">,</span> <span class="n">trace</span> <span class="o">&gt;</span> <span class="n">cvt</span><span class="p">]})</span>
         
     <span class="k">return</span> <span class="n">results</span>
@@ -1454,12 +1491,6 @@ Y = Feeltrace, X = Feeltrace, P Values = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Name   ::  Test Stat &gt; C(95%)    =&gt;   Signif  
- ----------------------------------------
-Words  ::  25.09     &gt; 12.3212   =&gt;   True
-Feeltrace ::  5.58      &gt; 4.1296    =&gt;   True
-</pre></div>
-</div>
 <div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[{&#39;Words&#39;: [25.090662611093716, 12.3212, True]},
  {&#39;Feeltrace&#39;: [5.576373930313893, 4.1296, True]}]
 </pre></div>
@@ -1491,22 +1522,25 @@ Feeltrace ::  5.58      &gt; 4.1296    =&gt;   True
     <span class="n">p_value</span> <span class="o">=</span> <span class="n">output</span><span class="p">[</span><span class="s1">&#39;pvalue&#39;</span><span class="p">]</span> 
     <span class="k">def</span> <span class="nf">adjust</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span> <span class="mi">6</span><span class="p">):</span> <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">val</span><span class="p">)</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="n">length</span><span class="p">)</span>
 
-    <span class="c1"># Print Summary</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;    Augmented Dickey-Fuller Test on &quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1">&quot;&#39;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">   &quot;</span><span class="p">,</span> <span class="s1">&#39;-&#39;</span><span class="o">*</span><span class="mi">47</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39; Null Hypothesis: Data has unit root. Non-Stationary.&#39;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39; Significance Level    = </span><span class="si">{</span><span class="n">signif</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39; Test Statistic        = </span><span class="si">{</span><span class="n">output</span><span class="p">[</span><span class="s2">&quot;test_statistic&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39; No. Lags Chosen       = </span><span class="si">{</span><span class="n">output</span><span class="p">[</span><span class="s2">&quot;n_lags&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+        <span class="c1"># Print Summary</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;    Augmented Dickey-Fuller Test on &quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1">&quot;&#39;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">   &quot;</span><span class="p">,</span> <span class="s1">&#39;-&#39;</span><span class="o">*</span><span class="mi">47</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39; Null Hypothesis: Data has unit root. Non-Stationary.&#39;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39; Significance Level    = </span><span class="si">{</span><span class="n">signif</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39; Test Statistic        = </span><span class="si">{</span><span class="n">output</span><span class="p">[</span><span class="s2">&quot;test_statistic&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39; No. Lags Chosen       = </span><span class="si">{</span><span class="n">output</span><span class="p">[</span><span class="s2">&quot;n_lags&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
 
-    <span class="k">for</span> <span class="n">key</span><span class="p">,</span><span class="n">val</span> <span class="ow">in</span> <span class="n">r</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39; Critical value </span><span class="si">{</span><span class="n">adjust</span><span class="p">(</span><span class="n">key</span><span class="p">)</span><span class="si">}</span><span class="s1"> = </span><span class="si">{</span><span class="nb">round</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span><span class="n">val</span> <span class="ow">in</span> <span class="n">r</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39; Critical value </span><span class="si">{</span><span class="n">adjust</span><span class="p">(</span><span class="n">key</span><span class="p">)</span><span class="si">}</span><span class="s1"> = </span><span class="si">{</span><span class="nb">round</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">p_value</span> <span class="o">&lt;=</span> <span class="n">signif</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot; =&gt; P-Value = </span><span class="si">{</span><span class="n">p_value</span><span class="si">}</span><span class="s2">. Rejecting Null Hypothesis.&quot;</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot; =&gt; Series is Stationary.&quot;</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot; =&gt; P-Value = </span><span class="si">{</span><span class="n">p_value</span><span class="si">}</span><span class="s2">. Weak evidence to reject the Null Hypothesis.&quot;</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot; =&gt; Series is Non-Stationary.&quot;</span><span class="p">)</span>  
+        <span class="k">if</span> <span class="n">p_value</span> <span class="o">&lt;=</span> <span class="n">signif</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot; =&gt; P-Value = </span><span class="si">{</span><span class="n">p_value</span><span class="si">}</span><span class="s2">. Rejecting Null Hypothesis.&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot; =&gt; Series is Stationary.&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot; =&gt; P-Value = </span><span class="si">{</span><span class="n">p_value</span><span class="si">}</span><span class="s2">. Weak evidence to reject the Null Hypothesis.&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot; =&gt; Series is Non-Stationary.&quot;</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">output</span>
         
  <span class="c1"># ADF Test on each column</span>
 <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">column</span> <span class="ow">in</span> <span class="n">p10_agg_data</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
@@ -1527,56 +1561,7 @@ Feeltrace ::  5.58      &gt; 4.1296    =&gt;   True
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>    Augmented Dickey-Fuller Test on &quot;Words&quot; 
-    -----------------------------------------------
- Null Hypothesis: Data has unit root. Non-Stationary.
- Significance Level    = 0.05
- Test Statistic        = -6.6022
- No. Lags Chosen       = 0
- Critical value 1%     = -3.679
- Critical value 5%     = -2.968
- Critical value 10%    = -2.623
- =&gt; P-Value = 0.0. Rejecting Null Hypothesis.
- =&gt; Series is Stationary.
-
-
-    Augmented Dickey-Fuller Test on &quot;Feeltrace&quot; 
-    -----------------------------------------------
- Null Hypothesis: Data has unit root. Non-Stationary.
- Significance Level    = 0.05
- Test Statistic        = -2.5379
- No. Lags Chosen       = 5
- Critical value 1%     = -3.738
- Critical value 5%     = -2.992
- Critical value 10%    = -2.636
- =&gt; P-Value = 0.1065. Weak evidence to reject the Null Hypothesis.
- =&gt; Series is Non-Stationary.
-
-
-    Augmented Dickey-Fuller Test on &quot;Words&quot; 
-    -----------------------------------------------
- Null Hypothesis: Data has unit root. Non-Stationary.
- Significance Level    = 0.05
- Test Statistic        = -6.0687
- No. Lags Chosen       = 2
- Critical value 1%     = -3.711
- Critical value 5%     = -2.981
- Critical value 10%    = -2.63
- =&gt; P-Value = 0.0. Rejecting Null Hypothesis.
- =&gt; Series is Stationary.
-
-
-    Augmented Dickey-Fuller Test on &quot;Feeltrace&quot; 
-    -----------------------------------------------
- Null Hypothesis: Data has unit root. Non-Stationary.
- Significance Level    = 0.05
- Test Statistic        = -6.2774
- No. Lags Chosen       = 3
- Critical value 1%     = -3.724
- Critical value 5%     = -2.986
- Critical value 10%    = -2.633
- =&gt; P-Value = 0.0. Rejecting Null Hypothesis.
- =&gt; Series is Stationary.
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>
 </pre></div>
 </div>
 </div>
@@ -1688,10 +1673,7 @@ BIC :  0.3522675062347499
 FPE :  1.0622432071420118
 HQIC:  0.13588855185103732 
 
-Lag Order = 
-</pre></div>
-</div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>2
+Lag Order = 2
 AIC :  0.0931959320852247
 BIC :  0.5868890694457246
 FPE :  1.1132639758642113
@@ -1796,8 +1778,8 @@ HQIC:  -3.831213665944237
 ==================================
 Model:                         VAR
 Method:                        OLS
-Date:           Sat, 16, Apr, 2022
-Time:                     11:23:00
+Date:           Sun, 17, Apr, 2022
+Time:                     10:09:48
 --------------------------------------------------------------------
 No. of Equations:         2.00000    BIC:                   -2.55188
 Nobs:                     18.0000    HQIC:                  -3.83121
@@ -2017,7 +1999,7 @@ Feeltrace : 1.04
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="_images/words-feeltrace_74_0.png" src="_images/words-feeltrace_74_0.png" />
+<img alt="_images/words-feeltrace_75_0.png" src="_images/words-feeltrace_75_0.png" />
 </div>
 </div>
 </div>
@@ -2074,11 +2056,11 @@ corr :  0.502
 minmax :  inf
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/var/folders/bl/2tw1vrc12mv_hqpbdf1j3wkw0000gn/T/ipykernel_82255/1231121430.py:11: FutureWarning: Support for multi-dimensional indexing (e.g. `obj[:, None]`) is deprecated and will be removed in a future version.  Convert to a numpy array before indexing instead.
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/var/folders/bl/2tw1vrc12mv_hqpbdf1j3wkw0000gn/T/ipykernel_89397/1231121430.py:11: FutureWarning: Support for multi-dimensional indexing (e.g. `obj[:, None]`) is deprecated and will be removed in a future version.  Convert to a numpy array before indexing instead.
   actual[:,None]]), axis=1)
-/var/folders/bl/2tw1vrc12mv_hqpbdf1j3wkw0000gn/T/ipykernel_82255/1231121430.py:13: FutureWarning: Support for multi-dimensional indexing (e.g. `obj[:, None]`) is deprecated and will be removed in a future version.  Convert to a numpy array before indexing instead.
+/var/folders/bl/2tw1vrc12mv_hqpbdf1j3wkw0000gn/T/ipykernel_89397/1231121430.py:13: FutureWarning: Support for multi-dimensional indexing (e.g. `obj[:, None]`) is deprecated and will be removed in a future version.  Convert to a numpy array before indexing instead.
   actual[:,None]]), axis=1)
-/var/folders/bl/2tw1vrc12mv_hqpbdf1j3wkw0000gn/T/ipykernel_82255/1231121430.py:14: RuntimeWarning: divide by zero encountered in true_divide
+/var/folders/bl/2tw1vrc12mv_hqpbdf1j3wkw0000gn/T/ipykernel_89397/1231121430.py:14: RuntimeWarning: divide by zero encountered in true_divide
   minmax = 1 - np.mean(mins/maxs)             # minmax
 </pre></div>
 </div>
@@ -2121,13 +2103,6 @@ minmax :  inf
 </div>
 <div class="section" id="all-participants">
 <h2>All participants<a class="headerlink" href="#all-participants" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="id1">
-<h3>Downsampling the continuous annotation<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
-<p>Before time series analysis can be performed, we must downsample the feeltrace to match the sample size of the interview words (or upsample the interview words):</p>
-<ul class="simple">
-<li><p><span class="math notranslate nohighlight">\(\text{Fs}_{\text{feeltrace}} = 30\)</span>Hz</p></li>
-<li><p><span class="math notranslate nohighlight">\(\text{Fs}_{\text{calibrated words}} \approx 0.05\)</span>Hz</p></li>
-</ul>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">scale</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">min_</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">max_</span><span class="o">=</span><span class="mi">200</span><span class="p">):</span>
@@ -2138,85 +2113,579 @@ minmax :  inf
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">n_windows</span> <span class="o">=</span> <span class="p">[]</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">prepare_data</span><span class="p">(</span><span class="n">words</span><span class="p">,</span> <span class="n">feeltrace</span><span class="p">):</span>
+    <span class="n">p_words</span> <span class="o">=</span> <span class="n">words</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">p_feeltrace</span> <span class="o">=</span> <span class="n">feeltrace</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+    <span class="n">p_words</span><span class="o">.</span><span class="n">Values</span> <span class="o">=</span> <span class="n">scale</span><span class="p">(</span><span class="n">p_words</span><span class="o">.</span><span class="n">Values</span><span class="p">)</span>
+    <span class="n">p_words</span><span class="o">.</span><span class="n">p_number</span> <span class="o">=</span> <span class="n">p_num_map</span><span class="p">[</span><span class="n">p_words</span><span class="o">.</span><span class="n">p_number</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+
+    <span class="n">p_feeltrace</span><span class="o">.</span><span class="n">Feeltrace</span> <span class="o">=</span> <span class="n">scale</span><span class="p">(</span><span class="n">p_feeltrace</span><span class="o">.</span><span class="n">Feeltrace</span><span class="p">)</span>
+    <span class="n">p_feeltrace</span><span class="o">.</span><span class="n">p_number</span> <span class="o">=</span> <span class="n">p_num_map</span><span class="p">[</span><span class="n">p_feeltrace</span><span class="o">.</span><span class="n">p_number</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+        
+    <span class="k">return</span> <span class="n">p_words</span><span class="p">,</span> <span class="n">p_feeltrace</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">get_indexes</span><span class="p">(</span><span class="n">feeltrace</span><span class="p">,</span> <span class="n">words</span><span class="p">):</span>
+    <span class="n">idxs</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">timestamps</span> <span class="o">=</span> <span class="n">words</span><span class="o">.</span><span class="n">Timestamps</span><span class="o">.</span><span class="n">rolling</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>    
+
+    <span class="k">for</span> <span class="n">timestamp</span> <span class="ow">in</span> <span class="n">timestamps</span><span class="p">:</span>
+        <span class="n">arr</span> <span class="o">=</span> <span class="n">feeltrace</span><span class="o">.</span><span class="n">Timestamps</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+        <span class="n">dist</span> <span class="o">=</span> <span class="p">(</span><span class="n">arr</span> <span class="o">-</span> <span class="n">timestamp</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>
+        <span class="n">idx</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">argwhere</span><span class="p">(</span><span class="n">dist</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">dist</span><span class="p">))[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">idxs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">idx</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        
+    <span class="k">return</span> <span class="n">idxs</span><span class="p">,</span> <span class="n">timestamps</span>
+
+
+<span class="k">def</span> <span class="nf">get_feeltrace_timestamps</span><span class="p">(</span><span class="n">feeltrace</span><span class="p">,</span> <span class="n">idxs</span><span class="p">):</span>
+    <span class="n">feeltrace_timestamps</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">feeltrace</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">idxs</span><span class="p">,</span> <span class="s1">&#39;Timestamps&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">rolling</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+
+    <span class="c1"># add first timestamp</span>
+    <span class="n">feeltrace_timestamps</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">feeltrace</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">idxs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s1">&#39;Timestamps&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="mi">2</span>
+
+    <span class="c1"># add last timestamp</span>
+    <span class="n">feeltrace_timestamps</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">feeltrace</span><span class="o">.</span><span class="n">Timestamps</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">feeltrace</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">idxs</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="s1">&#39;Timestamps&#39;</span><span class="p">])</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+
+    <span class="n">feeltrace_timestamps</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">feeltrace_timestamps</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">feeltrace_timestamps</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">aggregate_mean</span><span class="p">(</span><span class="n">feeltrace</span><span class="p">,</span> <span class="n">idxs</span><span class="p">):</span>
+    <span class="n">feeltrace_agg_mean</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
+
+    <span class="n">mean_feeltrace</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="c1"># first window</span>
+    <span class="n">mean_feeltrace</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">feeltrace</span><span class="o">.</span><span class="n">Feeltrace</span><span class="o">.</span><span class="n">loc</span><span class="p">[:</span><span class="n">idxs</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span>
+
+    <span class="c1"># middle windows</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">prev_idx</span><span class="p">,</span> <span class="n">idx</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">idxs</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">idxs</span><span class="p">[</span><span class="mi">1</span><span class="p">:]):</span>
+        <span class="n">mean_feeltrace</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">feeltrace</span><span class="o">.</span><span class="n">Feeltrace</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">prev_idx</span><span class="p">:</span><span class="n">idx</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span>
+
+    <span class="c1"># last window</span>
+    <span class="n">mean_feeltrace</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">feeltrace</span><span class="o">.</span><span class="n">Feeltrace</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">idxs</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:]</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span>
+
+    <span class="c1"># make sure both feeltrace and interview series are the same size</span>
+    <span class="k">assert</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">mean_feeltrace</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">p_words</span><span class="o">.</span><span class="n">Values</span><span class="p">))</span>
+
+    <span class="n">feeltrace_agg_mean</span><span class="p">[</span><span class="s1">&#39;Timestamps&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">feeltrace_timestamps</span>
+    <span class="n">feeltrace_agg_mean</span><span class="p">[</span><span class="s1">&#39;Feeltrace&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mean_feeltrace</span>
+    
+    <span class="k">return</span> <span class="n">feeltrace_agg_mean</span>
+
+<span class="k">def</span> <span class="nf">aggregate_slope</span><span class="p">(</span><span class="n">feeltrace</span><span class="p">,</span> <span class="n">idxs</span><span class="p">):</span>
+    <span class="n">feeltrace_agg_slope</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
+
+    <span class="n">slope_feeltrace</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="c1"># first window</span>
+    <span class="n">slope_feeltrace</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">change_direction</span><span class="p">(</span><span class="n">feeltrace</span><span class="o">.</span><span class="n">Feeltrace</span><span class="p">[:</span><span class="n">idxs</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span> <span class="n">feeltrace</span><span class="o">.</span><span class="n">Timestamps</span><span class="p">[:</span><span class="n">idxs</span><span class="p">[</span><span class="mi">0</span><span class="p">]]))</span>
+
+    <span class="c1"># middle windows</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">prev_idx</span><span class="p">,</span> <span class="n">idx</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">idxs</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">idxs</span><span class="p">[</span><span class="mi">1</span><span class="p">:]):</span>
+        <span class="n">slope_feeltrace</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">change_direction</span><span class="p">(</span><span class="n">feeltrace</span><span class="o">.</span><span class="n">Feeltrace</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">prev_idx</span><span class="p">:</span><span class="n">idx</span><span class="p">],</span> <span class="n">feeltrace</span><span class="o">.</span><span class="n">Timestamps</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">prev_idx</span><span class="p">:</span><span class="n">idx</span><span class="p">]))</span>
+
+    <span class="c1"># last window</span>
+    <span class="n">slope_feeltrace</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">change_direction</span><span class="p">(</span><span class="n">feeltrace</span><span class="o">.</span><span class="n">Feeltrace</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">idxs</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:],</span> <span class="n">feeltrace</span><span class="o">.</span><span class="n">Timestamps</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">idxs</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:]))</span>
+
+    <span class="n">feeltrace_agg_slope</span><span class="p">[</span><span class="s1">&#39;Timestamps&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">feeltrace_timestamps</span>
+    <span class="n">feeltrace_agg_slope</span><span class="p">[</span><span class="s1">&#39;Feeltrace&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">slope_feeltrace</span>
+    <span class="n">feeltrace_agg_slope</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+    
+    <span class="k">return</span> <span class="n">feeltrace_agg_slope</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Renaming participants:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">p_num_map</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;2&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;4&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;5&#39;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="s1">&#39;6&#39;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span> 
+             <span class="s1">&#39;7&#39;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span> <span class="s1">&#39;8&#39;</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span> <span class="s1">&#39;9&#39;</span><span class="p">:</span> <span class="mi">7</span><span class="p">,</span> <span class="s1">&#39;10&#39;</span><span class="p">:</span> <span class="mi">8</span><span class="p">,</span> 
+             <span class="s1">&#39;12&#39;</span><span class="p">:</span> <span class="mi">9</span><span class="p">,</span> <span class="s1">&#39;13&#39;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span> <span class="s1">&#39;15&#39;</span><span class="p">:</span> <span class="mi">11</span><span class="p">,</span> <span class="s1">&#39;17&#39;</span><span class="p">:</span> <span class="mi">12</span><span class="p">,</span> 
+             <span class="s1">&#39;19&#39;</span><span class="p">:</span> <span class="mi">13</span><span class="p">,</span> <span class="s1">&#39;20&#39;</span><span class="p">:</span> <span class="mi">14</span><span class="p">,</span> <span class="s1">&#39;22&#39;</span><span class="p">:</span> <span class="mi">15</span><span class="p">,</span> <span class="s1">&#39;23&#39;</span><span class="p">:</span> <span class="mi">16</span><span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="states">
+<h3>States<a class="headerlink" href="#states" title="Permalink to this headline">¶</a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">scipy.stats.stats</span> <span class="kn">import</span> <span class="n">pearsonr</span>
+
+<span class="n">n_windows</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">fs</span> <span class="o">=</span> <span class="p">[]</span>
 <span class="n">granger_p_values</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">stationarity</span> <span class="o">=</span> <span class="p">[]</span>
 <span class="n">cointegration_p_values</span> <span class="o">=</span> <span class="p">[]</span>
 <span class="n">pearsons_corr</span> <span class="o">=</span> <span class="p">[]</span>
 <span class="n">var_models</span> <span class="o">=</span> <span class="p">[]</span>
 
 <span class="k">for</span> <span class="p">(</span><span class="n">p_words</span><span class="p">,</span> <span class="n">p_feeltrace</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">words_list</span><span class="p">,</span> <span class="n">feeltrace_list</span><span class="p">):</span>
-    <span class="n">p_words</span> <span class="o">=</span> <span class="n">p_words</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-    <span class="n">p_feeltrace</span> <span class="o">=</span> <span class="n">p_feeltrace</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-
-    <span class="n">p_words</span><span class="o">.</span><span class="n">Values</span> <span class="o">=</span> <span class="n">scale</span><span class="p">(</span><span class="n">p_words</span><span class="o">.</span><span class="n">Values</span><span class="p">)</span>
-    <span class="n">p_feeltrace</span><span class="o">.</span><span class="n">Feeltrace</span> <span class="o">=</span> <span class="n">scale</span><span class="p">(</span><span class="n">p_feeltrace</span><span class="o">.</span><span class="n">Feeltrace</span><span class="p">)</span>
+    <span class="p">[</span><span class="n">p_words</span><span class="p">,</span> <span class="n">p_feeltrace</span><span class="p">]</span> <span class="o">=</span> <span class="n">prepare_data</span><span class="p">(</span><span class="n">p_words</span><span class="p">,</span> <span class="n">p_feeltrace</span><span class="p">)</span>
     
-    <span class="n">timestamps</span> <span class="o">=</span> <span class="n">p_words</span><span class="o">.</span><span class="n">Timestamps</span><span class="o">.</span><span class="n">rolling</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="n">timestamps</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+    <span class="n">fs</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s1">&#39;Words&#39;</span><span class="p">:</span> <span class="n">sampling_frequency</span><span class="p">(</span><span class="n">p_words</span><span class="p">),</span> 
+               <span class="s1">&#39;Feeltrace&#39;</span><span class="p">:</span> <span class="n">sampling_frequency</span><span class="p">(</span><span class="n">p_feeltrace</span><span class="p">),</span>
+               <span class="s1">&#39;p_number&#39;</span><span class="p">:</span> <span class="n">p_feeltrace</span><span class="o">.</span><span class="n">p_number</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+              <span class="p">})</span>
     
-    <span class="n">idxs</span> <span class="o">=</span> <span class="p">[]</span>
-
-    <span class="k">for</span> <span class="n">timestamp</span> <span class="ow">in</span> <span class="n">timestamps</span><span class="p">:</span>
-        <span class="n">arr</span> <span class="o">=</span> <span class="n">p_feeltrace</span><span class="o">.</span><span class="n">Timestamps</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
-        <span class="n">dist</span> <span class="o">=</span> <span class="p">(</span><span class="n">arr</span> <span class="o">-</span> <span class="n">timestamp</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>
-        <span class="n">idx</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">argwhere</span><span class="p">(</span><span class="n">dist</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">dist</span><span class="p">))[</span><span class="mi">0</span><span class="p">])</span>
-        <span class="n">idxs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">idx</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="p">[</span><span class="n">idxs</span><span class="p">,</span> <span class="n">timestamps</span><span class="p">]</span> <span class="o">=</span> <span class="n">get_indexes</span><span class="p">(</span><span class="n">p_feeltrace</span><span class="p">,</span> <span class="n">p_words</span><span class="p">)</span>
+    <span class="n">feeltrace_timestamps</span> <span class="o">=</span> <span class="n">get_feeltrace_timestamps</span><span class="p">(</span><span class="n">p_feeltrace</span><span class="p">,</span> <span class="n">idxs</span><span class="p">)</span>
     
-    <span class="n">feeltrace_timestamps</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">p_feeltrace</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">idxs</span><span class="p">,</span> <span class="s1">&#39;Timestamps&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">rolling</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
-
-    <span class="c1"># add first timestamp</span>
-    <span class="n">feeltrace_timestamps</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">p_feeltrace</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">idxs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s1">&#39;Timestamps&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="mi">2</span>
-
-    <span class="c1"># add last timestamp</span>
-    <span class="n">feeltrace_timestamps</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">p_feeltrace</span><span class="o">.</span><span class="n">Timestamps</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">p_feeltrace</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">idxs</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="s1">&#39;Timestamps&#39;</span><span class="p">])</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
-
-    <span class="n">feeltrace_timestamps</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">feeltrace_timestamps</span><span class="p">)</span>
-    
-    <span class="c1"># make sure both series are the same length</span>
+    <span class="c1"># make sure both timestamps are the same length</span>
     <span class="k">assert</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">feeltrace_timestamps</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">p_words</span><span class="o">.</span><span class="n">Timestamps</span><span class="p">))</span>
     
     <span class="n">n_windows</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s1">&#39;p_number&#39;</span><span class="p">:</span> <span class="n">p_words</span><span class="o">.</span><span class="n">p_number</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s1">&#39;n_windows&#39;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">feeltrace_timestamps</span><span class="p">)})</span>
     
-    <span class="n">p_feeltrace_agg_mean</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
-
-    <span class="n">mean_feeltrace</span> <span class="o">=</span> <span class="p">[]</span>
-
-    <span class="c1"># first window</span>
-    <span class="n">mean_feeltrace</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">p_feeltrace</span><span class="o">.</span><span class="n">Feeltrace</span><span class="o">.</span><span class="n">loc</span><span class="p">[:</span><span class="n">idxs</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span>
-
-    <span class="c1"># middle windows</span>
-    <span class="k">for</span> <span class="p">(</span><span class="n">prev_idx</span><span class="p">,</span> <span class="n">idx</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">idxs</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">idxs</span><span class="p">[</span><span class="mi">1</span><span class="p">:]):</span>
-        <span class="n">mean_feeltrace</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">p_feeltrace</span><span class="o">.</span><span class="n">Feeltrace</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">prev_idx</span><span class="p">:</span><span class="n">idx</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span>
-
-    <span class="c1"># last window</span>
-    <span class="n">mean_feeltrace</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">p_feeltrace</span><span class="o">.</span><span class="n">Feeltrace</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">idxs</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:]</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span>
-
-    <span class="c1"># make sure both feeltrace and interview series are the same size</span>
-    <span class="k">assert</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">mean_feeltrace</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">p_words</span><span class="o">.</span><span class="n">Values</span><span class="p">))</span>
-
-    <span class="n">p_feeltrace_agg_mean</span><span class="p">[</span><span class="s1">&#39;Timestamps&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">feeltrace_timestamps</span>
-    <span class="n">p_feeltrace_agg_mean</span><span class="p">[</span><span class="s1">&#39;Feeltrace&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mean_feeltrace</span>
+    <span class="n">p_feeltrace_agg_mean</span> <span class="o">=</span> <span class="n">aggregate_mean</span><span class="p">(</span><span class="n">p_feeltrace</span><span class="p">,</span> <span class="n">idxs</span><span class="p">)</span>
     
-    <span class="n">p_feeltrace_agg_slope</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
-
-    <span class="n">slope_feeltrace</span> <span class="o">=</span> <span class="p">[]</span>
-
-    <span class="c1"># first window</span>
-    <span class="n">slope_feeltrace</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">change_direction</span><span class="p">(</span><span class="n">p_feeltrace</span><span class="o">.</span><span class="n">Feeltrace</span><span class="p">[:</span><span class="n">idxs</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span> <span class="n">p_feeltrace</span><span class="o">.</span><span class="n">Timestamps</span><span class="p">[:</span><span class="n">idxs</span><span class="p">[</span><span class="mi">0</span><span class="p">]]))</span>
-
-    <span class="c1"># middle windows</span>
-    <span class="k">for</span> <span class="p">(</span><span class="n">prev_idx</span><span class="p">,</span> <span class="n">idx</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">idxs</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">idxs</span><span class="p">[</span><span class="mi">1</span><span class="p">:]):</span>
-        <span class="n">slope_feeltrace</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">change_direction</span><span class="p">(</span><span class="n">p_feeltrace</span><span class="o">.</span><span class="n">Feeltrace</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">prev_idx</span><span class="p">:</span><span class="n">idx</span><span class="p">],</span> <span class="n">p_feeltrace</span><span class="o">.</span><span class="n">Timestamps</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">prev_idx</span><span class="p">:</span><span class="n">idx</span><span class="p">]))</span>
-
-    <span class="c1"># last window</span>
-    <span class="n">slope_feeltrace</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">change_direction</span><span class="p">(</span><span class="n">p_feeltrace</span><span class="o">.</span><span class="n">Feeltrace</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">idxs</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:],</span> <span class="n">p_feeltrace</span><span class="o">.</span><span class="n">Timestamps</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">idxs</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:]))</span>
-
     <span class="c1"># make sure both feeltrace and interview series are the same size</span>
-    <span class="k">assert</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">slope_feeltrace</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">p_words</span><span class="o">.</span><span class="n">Values</span><span class="p">))</span>
+    <span class="k">assert</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">p_feeltrace_agg_mean</span><span class="o">.</span><span class="n">Feeltrace</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">p_words</span><span class="o">.</span><span class="n">Values</span><span class="p">))</span>
+    
+    <span class="n">p_agg_data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
+    <span class="n">p_agg_data</span><span class="p">[</span><span class="s1">&#39;Timestamps&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">p_words</span><span class="p">[</span><span class="s1">&#39;Timestamps&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">p_agg_data</span><span class="p">[</span><span class="s1">&#39;Words&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">p_words</span><span class="p">[</span><span class="s1">&#39;Values&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">p_agg_data</span><span class="p">[</span><span class="s1">&#39;Feeltrace&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">p_feeltrace_agg_mean</span><span class="p">[</span><span class="s1">&#39;Feeltrace&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    
+    <span class="n">maxlag</span> <span class="o">=</span> <span class="mi">1</span>
+    
+    <span class="c1"># transitions</span>
+    <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">grangers_causation_matrix</span><span class="p">(</span><span class="n">p_agg_data</span><span class="p">[[</span><span class="s1">&#39;Words&#39;</span><span class="p">,</span> <span class="s1">&#39;Feeltrace&#39;</span><span class="p">]],</span> <span class="n">variables</span> <span class="o">=</span> <span class="n">p_agg_data</span><span class="p">[[</span><span class="s1">&#39;Words&#39;</span><span class="p">,</span> <span class="s1">&#39;Feeltrace&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> 
+            <span class="n">maxlag</span><span class="o">+=</span><span class="mi">1</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+            <span class="n">maxlag</span><span class="o">-=</span><span class="mi">1</span>
+            <span class="n">granger_p_values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">grangers_causation_matrix</span><span class="p">(</span><span class="n">p_agg_data</span><span class="p">[[</span><span class="s1">&#39;Words&#39;</span><span class="p">,</span> <span class="s1">&#39;Feeltrace&#39;</span><span class="p">]],</span> <span class="n">variables</span> <span class="o">=</span> <span class="n">p_agg_data</span><span class="p">[[</span><span class="s1">&#39;Words&#39;</span><span class="p">,</span> <span class="s1">&#39;Feeltrace&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">columns</span><span class="p">))</span>
+            <span class="k">break</span>
+            
+    <span class="n">stationarity</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s1">&#39;p_number&#39;</span><span class="p">:</span> <span class="n">p_feeltrace</span><span class="o">.</span><span class="n">p_number</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                         <span class="s1">&#39;Words&#39;</span><span class="p">:</span> <span class="n">adfuller_test</span><span class="p">(</span><span class="n">p_agg_data</span><span class="p">[</span><span class="s1">&#39;Words&#39;</span><span class="p">]),</span> 
+                         <span class="s1">&#39;Feeltrace&#39;</span><span class="p">:</span> <span class="n">adfuller_test</span><span class="p">(</span><span class="n">p_agg_data</span><span class="p">[</span><span class="s1">&#39;Feeltrace&#39;</span><span class="p">])</span>
+                        <span class="p">})</span>
+    <span class="n">cointegration_p_values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cointegration_test</span><span class="p">(</span><span class="n">p_agg_data</span><span class="p">[[</span><span class="s1">&#39;Words&#39;</span><span class="p">,</span> <span class="s1">&#39;Feeltrace&#39;</span><span class="p">]]))</span>
+    <span class="n">pearsons_corr</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pearsonr</span><span class="p">(</span><span class="n">p_agg_data</span><span class="p">[</span><span class="s1">&#39;Words&#39;</span><span class="p">],</span><span class="n">p_agg_data</span><span class="p">[</span><span class="s1">&#39;Feeltrace&#39;</span><span class="p">]))</span>
+    
+    <span class="c1"># The VAR model will be fitted on df_train and then used to forecast the next 4 </span>
+    <span class="c1"># observations. These forecasts will be compared against the actuals present in </span>
+    <span class="c1"># test data.</span>
 
-    <span class="n">p_feeltrace_agg_slope</span><span class="p">[</span><span class="s1">&#39;Timestamps&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">feeltrace_timestamps</span>
-    <span class="n">p_feeltrace_agg_slope</span><span class="p">[</span><span class="s1">&#39;Feeltrace&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">slope_feeltrace</span>
-    <span class="n">p_feeltrace_agg_slope</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+
+    <span class="n">nobs</span> <span class="o">=</span> <span class="mi">4</span>
+    <span class="n">df_train</span><span class="p">,</span> <span class="n">df_test</span> <span class="o">=</span> <span class="n">p_agg_data</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="o">-</span><span class="n">nobs</span><span class="p">],</span> <span class="n">p_agg_data</span><span class="p">[</span><span class="o">-</span><span class="n">nobs</span><span class="p">:]</span>
+
+    <span class="c1"># Check size</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">VAR</span><span class="p">(</span><span class="n">df_train</span><span class="p">[[</span><span class="s1">&#39;Words&#39;</span><span class="p">,</span> <span class="s1">&#39;Feeltrace&#39;</span><span class="p">]])</span>
+
+    <span class="n">maxlag</span> <span class="o">=</span> <span class="mi">1</span>
+
+    <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">select_order</span><span class="p">(</span><span class="n">maxlags</span><span class="o">=</span><span class="n">maxlag</span><span class="p">)</span>
+            <span class="n">maxlag</span><span class="o">+=</span><span class="mi">1</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+            <span class="n">maxlag</span><span class="o">-=</span><span class="mi">1</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">select_order</span><span class="p">(</span><span class="n">maxlags</span><span class="o">=</span><span class="n">maxlag</span><span class="p">)</span>
+            <span class="n">model_fitted</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">maxlag</span><span class="p">)</span>
+            <span class="k">break</span>
+
+    <span class="n">var_models</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">x</span><span class="p">,</span> <span class="n">model_fitted</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/Users/rubiarg/.virtualenvs/cpsc554x/lib/python3.9/site-packages/statsmodels/tsa/vector_ar/vecm.py:726: RuntimeWarning: invalid value encountered in log
+  tmp = np.log(iota - a)[i:]
+/Users/rubiarg/.virtualenvs/cpsc554x/lib/python3.9/site-packages/statsmodels/tsa/vector_ar/vecm.py:728: RuntimeWarning: invalid value encountered in log
+  lr2[i] = -t * np.log(1 - a[i])
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">n_windows</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">n_windows</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>For the following secionts, I perform multiple comparisons using Bonferroni-Holm correction:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">statsmodels.stats.multitest</span> <span class="kn">import</span> <span class="n">multipletests</span>
+<span class="n">rejected</span><span class="p">,</span> <span class="n">p_adjusted</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">alpha_corrected</span> <span class="o">=</span> <span class="n">multipletests</span><span class="p">(</span><span class="n">raw_pvals</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">,</span> 
+                               <span class="n">method</span><span class="o">=</span><span class="s1">&#39;bonferroni&#39;</span><span class="p">,</span> <span class="n">is_sorted</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">returnsorted</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">rejected</span><span class="p">)</span>
+<span class="c1"># 2</span>
+<span class="n">alpha_corrected</span> 
+<span class="c1"># 0.0005</span>
+
+</pre></div>
+</div>
+<div class="section" id="id1">
+<h4>Granger Causality<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h4>
+<p>TODO: calculate power / effect size</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">words_to_feeltrace</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">feeltrace_to_words</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">granger_p_values</span><span class="p">:</span>
+    <span class="n">words_to_feeltrace</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">value</span><span class="o">.</span><span class="n">Words_x</span><span class="o">.</span><span class="n">Feeltrace_y</span><span class="p">)</span>
+    <span class="n">feeltrace_to_words</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">value</span><span class="o">.</span><span class="n">Feeltrace_x</span><span class="o">.</span><span class="n">Words_y</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">statsmodels.stats.multitest</span> <span class="kn">import</span> <span class="n">multipletests</span>
+<span class="n">rejected</span><span class="p">,</span> <span class="n">p_adjusted</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">alpha_corrected</span> <span class="o">=</span> <span class="n">multipletests</span><span class="p">(</span><span class="n">words_to_feeltrace</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span> 
+                                                         <span class="n">method</span><span class="o">=</span><span class="s1">&#39;holm&#39;</span><span class="p">,</span> 
+                                                         <span class="n">is_sorted</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">returnsorted</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Rejected H0: %d&#39;</span> <span class="o">%</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">rejected</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Corrected alpha: %f&#39;</span> <span class="o">%</span> <span class="n">alpha_corrected</span><span class="p">)</span>
+
+<span class="n">sns</span><span class="o">.</span><span class="n">kdeplot</span><span class="p">(</span><span class="n">words_to_feeltrace</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">,</span> <span class="n">shade</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;raw&#39;</span><span class="p">)</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">kdeplot</span><span class="p">(</span><span class="n">p_adjusted</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;green&quot;</span><span class="p">,</span> <span class="n">shade</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;adujusted&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">xlim</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Distribution of p-values&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">();</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Rejected H0: 10
+Corrected alpha: 0.003125
+</pre></div>
+</div>
+<img alt="_images/words-feeltrace_92_1.png" src="_images/words-feeltrace_92_1.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">n_windows</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">p_adjusted</span> <span class="o">&lt;</span> <span class="mf">0.05</span><span class="p">,</span> <span class="s1">&#39;p_number&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0      8
+2     10
+4     12
+5     13
+6      1
+7     14
+8     15
+9     16
+12     4
+13     5
+Name: p_number, dtype: int64
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">n_windows</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">p_adjusted</span> <span class="o">&gt;=</span> <span class="mf">0.05</span><span class="p">,</span> <span class="s1">&#39;p_number&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>1      9
+3     11
+10     2
+11     3
+14     6
+15     7
+Name: p_number, dtype: int64
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">statsmodels.stats.multitest</span> <span class="kn">import</span> <span class="n">multipletests</span>
+<span class="n">rejected</span><span class="p">,</span> <span class="n">p_adjusted</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">alpha_corrected</span> <span class="o">=</span> <span class="n">multipletests</span><span class="p">(</span><span class="n">feeltrace_to_words</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span> 
+                                                         <span class="n">method</span><span class="o">=</span><span class="s1">&#39;holm&#39;</span><span class="p">,</span> 
+                                                         <span class="n">is_sorted</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">returnsorted</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Rejected H0: %d&#39;</span> <span class="o">%</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">rejected</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Corrected alpha: %f&#39;</span> <span class="o">%</span> <span class="n">alpha_corrected</span><span class="p">)</span>
+
+<span class="n">sns</span><span class="o">.</span><span class="n">kdeplot</span><span class="p">(</span><span class="n">feeltrace_to_words</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">,</span> <span class="n">shade</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;raw&#39;</span><span class="p">)</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">kdeplot</span><span class="p">(</span><span class="n">p_adjusted</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;green&quot;</span><span class="p">,</span> <span class="n">shade</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;adujusted&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">xlim</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Distribution of p-values&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">();</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Rejected H0: 12
+Corrected alpha: 0.003125
+</pre></div>
+</div>
+<img alt="_images/words-feeltrace_95_1.png" src="_images/words-feeltrace_95_1.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">n_windows</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">p_adjusted</span> <span class="o">&lt;</span> <span class="mf">0.05</span><span class="p">,</span> <span class="s1">&#39;p_number&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0      8
+1      9
+2     10
+3     11
+6      1
+7     14
+8     15
+9     16
+11     3
+13     5
+14     6
+15     7
+Name: p_number, dtype: int64
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">n_windows</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">p_adjusted</span> <span class="o">&gt;=</span> <span class="mf">0.05</span><span class="p">,</span> <span class="s1">&#39;p_number&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>4     12
+5     13
+10     2
+12     4
+Name: p_number, dtype: int64
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="id2">
+<h4>Cointegration<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h4>
+<p>TODO: summarize</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cointegration_p_values</span> <span class="c1"># not p-values, different test statistic</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[[{&#39;Words&#39;: [3.4212347600699022, 12.3212, False]},
+  {&#39;Feeltrace&#39;: [0.2385070084338315, 4.1296, False]}],
+ [{&#39;Words&#39;: [7.75522318438243, 12.3212, False]},
+  {&#39;Feeltrace&#39;: [0.4052903886683129, 4.1296, False]}],
+ [{&#39;Words&#39;: [6.992609081946456, 12.3212, False]},
+  {&#39;Feeltrace&#39;: [0.5163451921786284, 4.1296, False]}],
+ [{&#39;Words&#39;: [5.344539328990742, 12.3212, False]},
+  {&#39;Feeltrace&#39;: [0.15470771521714644, 4.1296, False]}],
+ [{&#39;Words&#39;: [6.006007817148245, 12.3212, False]},
+  {&#39;Feeltrace&#39;: [0.6873254132523675, 4.1296, False]}],
+ [{&#39;Words&#39;: [5.738308052628689, 12.3212, False]},
+  {&#39;Feeltrace&#39;: [0.0025107181676411504, 4.1296, False]}],
+ [{&#39;Words&#39;: [7.157326702356029, 12.3212, False]},
+  {&#39;Feeltrace&#39;: [0.15934413516699125, 4.1296, False]}],
+ [{&#39;Words&#39;: [11.836391724073382, 12.3212, False]},
+  {&#39;Feeltrace&#39;: [0.8941641724252629, 4.1296, False]}],
+ [{&#39;Words&#39;: [6.862528629887459, 12.3212, False]},
+  {&#39;Feeltrace&#39;: [0.17063682392213397, 4.1296, False]}],
+ [{&#39;Words&#39;: [6.9725901011308205, 12.3212, False]},
+  {&#39;Feeltrace&#39;: [0.3887097937082306, 4.1296, False]}],
+ [{&#39;Words&#39;: [8.442493725666262, 12.3212, False]},
+  {&#39;Feeltrace&#39;: [0.4831042963914095, 4.1296, False]}],
+ [{&#39;Words&#39;: [3.7997218911182133, 12.3212, False]},
+  {&#39;Feeltrace&#39;: [0.6631390199841055, 4.1296, False]}],
+ [{&#39;Words&#39;: [nan, 12.3212, False]},
+  {&#39;Feeltrace&#39;: [2.7198828684742207, 4.1296, False]}],
+ [{&#39;Words&#39;: [7.663270611043467, 12.3212, False]},
+  {&#39;Feeltrace&#39;: [0.09019014958801941, 4.1296, False]}],
+ [{&#39;Words&#39;: [2.1829317419270575, 12.3212, False]},
+  {&#39;Feeltrace&#39;: [0.7470251016767713, 4.1296, False]}],
+ [{&#39;Words&#39;: [9.18304693321639, 12.3212, False]},
+  {&#39;Feeltrace&#39;: [0.2392415220497838, 4.1296, False]}]]
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="id3">
+<h4>Pearson’s correlation<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h4>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pearsons_corr</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[(0.4278339922605644, 0.016354434278091804),
+ (-0.038380217566385766, 0.804639273050901),
+ (0.12870160185958213, 0.4477586122212064),
+ (0.06494452368750947, 0.6866437028767354),
+ (0.20019440184749104, 0.27195041587861246),
+ (0.20514233108517874, 0.26002988641099556),
+ (0.38170567065931393, 0.008856616352697225),
+ (0.37283394344403054, 0.017818209741283043),
+ (-0.0035508667789532853, 0.9824211952387047),
+ (-0.04936154185393758, 0.7685288820942257),
+ (0.37507989332830494, 0.015676468991584567),
+ (0.3521731012833589, 0.09145914392721871),
+ (0.16243607618703237, 0.5064287410907694),
+ (0.010102694230016113, 0.9506660035306832),
+ (0.2669588936643751, 0.11550083256908102),
+ (-0.029935411905594025, 0.8399348368796864)]
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pearsons_corr_values</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">pearsons_corr</span><span class="p">]</span>
+<span class="n">pearsons_corr_p_values</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">pearsons_corr</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sns</span><span class="o">.</span><span class="n">kdeplot</span><span class="p">(</span><span class="n">pearsons_corr_values</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">,</span> <span class="n">shade</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;rho&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Distribution of correlation values&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">();</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/words-feeltrace_103_0.png" src="_images/words-feeltrace_103_0.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">rejected</span><span class="p">,</span> <span class="n">p_adjusted</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">alpha_corrected</span> <span class="o">=</span> <span class="n">multipletests</span><span class="p">(</span><span class="n">pearsons_corr_p_values</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span> 
+                                                         <span class="n">method</span><span class="o">=</span><span class="s1">&#39;holm&#39;</span><span class="p">,</span> 
+                                                         <span class="n">is_sorted</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">returnsorted</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Rejected H0: %d&#39;</span> <span class="o">%</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">rejected</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Corrected alpha: %f&#39;</span> <span class="o">%</span> <span class="n">alpha_corrected</span><span class="p">)</span>
+
+<span class="n">sns</span><span class="o">.</span><span class="n">kdeplot</span><span class="p">(</span><span class="n">feeltrace_to_words</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">,</span> <span class="n">shade</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;raw&#39;</span><span class="p">)</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">kdeplot</span><span class="p">(</span><span class="n">p_adjusted</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;green&quot;</span><span class="p">,</span> <span class="n">shade</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;adujusted&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">xlim</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Distribution of p-values&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">();</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Rejected H0: 0
+Corrected alpha: 0.003125
+</pre></div>
+</div>
+<img alt="_images/words-feeltrace_104_1.png" src="_images/words-feeltrace_104_1.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">n_windows</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">p_adjusted</span> <span class="o">&lt;</span> <span class="mf">0.05</span><span class="p">,</span> <span class="s1">&#39;p_number&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Series([], Name: p_number, dtype: int64)
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">n_windows</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">p_adjusted</span> <span class="o">&gt;=</span> <span class="mf">0.05</span><span class="p">,</span> <span class="s1">&#39;p_number&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0      8
+1      9
+2     10
+3     11
+4     12
+5     13
+6      1
+7     14
+8     15
+9     16
+10     2
+11     3
+12     4
+13     5
+14     6
+15     7
+Name: p_number, dtype: int64
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="id4">
+<h4>VAR Model<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h4>
+<p>TODO:</p>
+<ul class="simple">
+<li><p>Summarize VAR model results</p></li>
+<li><p>Cluster using VAR coefficients</p></li>
+</ul>
+</div>
+</div>
+<div class="section" id="transitions">
+<h3>Transitions<a class="headerlink" href="#transitions" title="Permalink to this headline">¶</a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">scipy.stats.stats</span> <span class="kn">import</span> <span class="n">pearsonr</span>
+
+<span class="n">n_windows</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">fs</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">granger_p_values</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">stationarity</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">cointegration_p_values</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">pearsons_corr</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">var_models</span> <span class="o">=</span> <span class="p">[]</span>
+
+<span class="k">for</span> <span class="p">(</span><span class="n">p_words</span><span class="p">,</span> <span class="n">p_feeltrace</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">words_list</span><span class="p">,</span> <span class="n">feeltrace_list</span><span class="p">):</span>
+    <span class="p">[</span><span class="n">p_words</span><span class="p">,</span> <span class="n">p_feeltrace</span><span class="p">]</span> <span class="o">=</span> <span class="n">prepare_data</span><span class="p">(</span><span class="n">p_words</span><span class="p">,</span> <span class="n">p_feeltrace</span><span class="p">)</span>
+    
+    <span class="n">fs</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s1">&#39;Words&#39;</span><span class="p">:</span> <span class="n">sampling_frequency</span><span class="p">(</span><span class="n">p_words</span><span class="p">),</span> 
+               <span class="s1">&#39;Feeltrace&#39;</span><span class="p">:</span> <span class="n">sampling_frequency</span><span class="p">(</span><span class="n">p_feeltrace</span><span class="p">),</span>
+               <span class="s1">&#39;p_number&#39;</span><span class="p">:</span> <span class="n">p_feeltrace</span><span class="o">.</span><span class="n">p_number</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+              <span class="p">})</span>
+    
+    <span class="p">[</span><span class="n">idxs</span><span class="p">,</span> <span class="n">timestamps</span><span class="p">]</span> <span class="o">=</span> <span class="n">get_indexes</span><span class="p">(</span><span class="n">p_feeltrace</span><span class="p">,</span> <span class="n">p_words</span><span class="p">)</span>
+    <span class="n">feeltrace_timestamps</span> <span class="o">=</span> <span class="n">get_feeltrace_timestamps</span><span class="p">(</span><span class="n">p_feeltrace</span><span class="p">,</span> <span class="n">idxs</span><span class="p">)</span>
+    
+    <span class="c1"># make sure both timestamps are the same length</span>
+    <span class="k">assert</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">feeltrace_timestamps</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">p_words</span><span class="o">.</span><span class="n">Timestamps</span><span class="p">))</span>
+    
+    <span class="n">n_windows</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s1">&#39;p_number&#39;</span><span class="p">:</span> <span class="n">p_words</span><span class="o">.</span><span class="n">p_number</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s1">&#39;n_windows&#39;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">feeltrace_timestamps</span><span class="p">)})</span>
+    
+    <span class="n">p_feeltrace_agg_mean</span> <span class="o">=</span> <span class="n">aggregate_mean</span><span class="p">(</span><span class="n">p_feeltrace</span><span class="p">,</span> <span class="n">idxs</span><span class="p">)</span>
+    
+    <span class="c1"># make sure both feeltrace and interview series are the same size</span>
+    <span class="k">assert</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">p_feeltrace_agg_mean</span><span class="o">.</span><span class="n">Feeltrace</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">p_words</span><span class="o">.</span><span class="n">Values</span><span class="p">))</span>
+    
+    <span class="n">p_feeltrace_agg_slope</span> <span class="o">=</span> <span class="n">aggregate_slope</span><span class="p">(</span><span class="n">p_feeltrace</span><span class="p">,</span> <span class="n">idxs</span><span class="p">)</span>
+    
+    <span class="c1"># make sure both feeltrace and interview series are the same size</span>
+    <span class="k">assert</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">p_feeltrace_agg_slope</span><span class="o">.</span><span class="n">Feeltrace</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">p_words</span><span class="o">.</span><span class="n">Values</span><span class="p">))</span>
     
     <span class="n">p_feeltrace_agg_mean_slope</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
 
@@ -2251,6 +2720,7 @@ minmax :  inf
     
     <span class="n">maxlag</span> <span class="o">=</span> <span class="mi">1</span>
     
+    <span class="c1"># transitions</span>
     <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">grangers_causation_matrix</span><span class="p">(</span><span class="n">p_agg_data</span><span class="p">[[</span><span class="s1">&#39;Words&#39;</span><span class="p">,</span> <span class="s1">&#39;Feeltrace&#39;</span><span class="p">]],</span> <span class="n">variables</span> <span class="o">=</span> <span class="n">p_agg_data</span><span class="p">[[</span><span class="s1">&#39;Words&#39;</span><span class="p">,</span> <span class="s1">&#39;Feeltrace&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> 
@@ -2260,8 +2730,12 @@ minmax :  inf
             <span class="n">granger_p_values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">grangers_causation_matrix</span><span class="p">(</span><span class="n">p_agg_data</span><span class="p">[[</span><span class="s1">&#39;Words&#39;</span><span class="p">,</span> <span class="s1">&#39;Feeltrace&#39;</span><span class="p">]],</span> <span class="n">variables</span> <span class="o">=</span> <span class="n">p_agg_data</span><span class="p">[[</span><span class="s1">&#39;Words&#39;</span><span class="p">,</span> <span class="s1">&#39;Feeltrace&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">columns</span><span class="p">))</span>
             <span class="k">break</span>
             
+    <span class="n">stationarity</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s1">&#39;p_number&#39;</span><span class="p">:</span> <span class="n">p_feeltrace</span><span class="o">.</span><span class="n">p_number</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                         <span class="s1">&#39;Words&#39;</span><span class="p">:</span> <span class="n">adfuller_test</span><span class="p">(</span><span class="n">p_agg_data</span><span class="p">[</span><span class="s1">&#39;Words&#39;</span><span class="p">]),</span> 
+                         <span class="s1">&#39;Feeltrace&#39;</span><span class="p">:</span> <span class="n">adfuller_test</span><span class="p">(</span><span class="n">p_agg_data</span><span class="p">[</span><span class="s1">&#39;Feeltrace&#39;</span><span class="p">])</span>
+                        <span class="p">})</span>
     <span class="n">cointegration_p_values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cointegration_test</span><span class="p">(</span><span class="n">p_agg_data</span><span class="p">[[</span><span class="s1">&#39;Words&#39;</span><span class="p">,</span> <span class="s1">&#39;Feeltrace&#39;</span><span class="p">]]))</span>
-    <span class="n">pearsons_corr</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">p_agg_data</span><span class="p">[[</span><span class="s1">&#39;Words&#39;</span><span class="p">,</span> <span class="s1">&#39;Feeltrace&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">corr</span><span class="p">())</span>
+    <span class="n">pearsons_corr</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pearsonr</span><span class="p">(</span><span class="n">p_agg_data</span><span class="p">[</span><span class="s1">&#39;Words&#39;</span><span class="p">],</span><span class="n">p_agg_data</span><span class="p">[</span><span class="s1">&#39;Feeltrace&#39;</span><span class="p">]))</span>
     
     <span class="c1"># The VAR model will be fitted on df_train and then used to forecast the next 4 </span>
     <span class="c1"># observations. These forecasts will be compared against the actuals present in </span>
@@ -2291,106 +2765,10 @@ minmax :  inf
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Name   ::  Test Stat &gt; C(95%)    =&gt;   Signif  
- ----------------------------------------
-Words  ::  25.09     &gt; 12.3212   =&gt;   True
-Feeltrace ::  5.58      &gt; 4.1296    =&gt;   True
-</pre></div>
-</div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Name   ::  Test Stat &gt; C(95%)    =&gt;   Signif  
- ----------------------------------------
-Words  ::  13.6      &gt; 12.3212   =&gt;   True
-Feeltrace ::  6.28      &gt; 4.1296    =&gt;   True
-</pre></div>
-</div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Name   ::  Test Stat &gt; C(95%)    =&gt;   Signif  
- ----------------------------------------
-Words  ::  9.38      &gt; 12.3212   =&gt;   False
-Feeltrace ::  0.2       &gt; 4.1296    =&gt;   False
-</pre></div>
-</div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Name   ::  Test Stat &gt; C(95%)    =&gt;   Signif  
- ----------------------------------------
-Words  ::  11.66     &gt; 12.3212   =&gt;   False
-Feeltrace ::  1.91      &gt; 4.1296    =&gt;   False
-</pre></div>
-</div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Name   ::  Test Stat &gt; C(95%)    =&gt;   Signif  
- ----------------------------------------
-Words  ::  9.11      &gt; 12.3212   =&gt;   False
-Feeltrace ::  1.15      &gt; 4.1296    =&gt;   False
-</pre></div>
-</div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Name   ::  Test Stat &gt; C(95%)    =&gt;   Signif  
- ----------------------------------------
-Words  ::  17.79     &gt; 12.3212   =&gt;   True
-Feeltrace ::  2.97      &gt; 4.1296    =&gt;   False
-</pre></div>
-</div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Name   ::  Test Stat &gt; C(95%)    =&gt;   Signif  
- ----------------------------------------
-Words  ::  19.34     &gt; 12.3212   =&gt;   True
-Feeltrace ::  5.47      &gt; 4.1296    =&gt;   True
-</pre></div>
-</div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Name   ::  Test Stat &gt; C(95%)    =&gt;   Signif  
- ----------------------------------------
-Words  ::  15.93     &gt; 12.3212   =&gt;   True
-Feeltrace ::  3.52      &gt; 4.1296    =&gt;   False
-</pre></div>
-</div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Name   ::  Test Stat &gt; C(95%)    =&gt;   Signif  
- ----------------------------------------
-Words  ::  16.97     &gt; 12.3212   =&gt;   True
-Feeltrace ::  3.89      &gt; 4.1296    =&gt;   False
-</pre></div>
-</div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Name   ::  Test Stat &gt; C(95%)    =&gt;   Signif  
- ----------------------------------------
-Words  ::  24.97     &gt; 12.3212   =&gt;   True
-Feeltrace ::  0.15      &gt; 4.1296    =&gt;   False
-</pre></div>
-</div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Name   ::  Test Stat &gt; C(95%)    =&gt;   Signif  
- ----------------------------------------
-Words  ::  19.93     &gt; 12.3212   =&gt;   True
-Feeltrace ::  4.57      &gt; 4.1296    =&gt;   True
-</pre></div>
-</div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Name   ::  Test Stat &gt; C(95%)    =&gt;   Signif  
- ----------------------------------------
-Words  ::  15.53     &gt; 12.3212   =&gt;   True
-Feeltrace ::  0.78      &gt; 4.1296    =&gt;   False
-</pre></div>
-</div>
 <div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/Users/rubiarg/.virtualenvs/cpsc554x/lib/python3.9/site-packages/statsmodels/tsa/vector_ar/vecm.py:726: RuntimeWarning: invalid value encountered in log
   tmp = np.log(iota - a)[i:]
 /Users/rubiarg/.virtualenvs/cpsc554x/lib/python3.9/site-packages/statsmodels/tsa/vector_ar/vecm.py:728: RuntimeWarning: invalid value encountered in log
   lr2[i] = -t * np.log(1 - a[i])
-</pre></div>
-</div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Name   ::  Test Stat &gt; C(95%)    =&gt;   Signif  
- ----------------------------------------
-Words  ::  nan       &gt; 12.3212   =&gt;   False
-Feeltrace ::  413.21    &gt; 4.1296    =&gt;   True
-</pre></div>
-</div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Name   ::  Test Stat &gt; C(95%)    =&gt;   Signif  
- ----------------------------------------
-Words  ::  16.63     &gt; 12.3212   =&gt;   True
-Feeltrace ::  5.62      &gt; 4.1296    =&gt;   True
-</pre></div>
-</div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Name   ::  Test Stat &gt; C(95%)    =&gt;   Signif  
- ----------------------------------------
-Words  ::  18.88     &gt; 12.3212   =&gt;   True
-Feeltrace ::  6.86      &gt; 4.1296    =&gt;   True
-</pre></div>
-</div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Name   ::  Test Stat &gt; C(95%)    =&gt;   Signif  
- ----------------------------------------
-Words  ::  18.4      &gt; 12.3212   =&gt;   True
-Feeltrace ::  8.45      &gt; 4.1296    =&gt;   True
 </pre></div>
 </div>
 </div>
@@ -2427,7 +2805,120 @@ Name: n_windows, dtype: float64
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="_images/words-feeltrace_86_0.png" src="_images/words-feeltrace_86_0.png" />
+<img alt="_images/words-feeltrace_112_0.png" src="_images/words-feeltrace_112_0.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fs</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">fs</span><span class="p">)</span>
+<span class="n">fs</span><span class="o">.</span><span class="n">describe</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Words</th>
+      <th>Feeltrace</th>
+      <th>p_number</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>count</th>
+      <td>16.000000</td>
+      <td>16.000000</td>
+      <td>16.000000</td>
+    </tr>
+    <tr>
+      <th>mean</th>
+      <td>0.049733</td>
+      <td>28.679300</td>
+      <td>8.500000</td>
+    </tr>
+    <tr>
+      <th>std</th>
+      <td>0.014987</td>
+      <td>1.069693</td>
+      <td>4.760952</td>
+    </tr>
+    <tr>
+      <th>min</th>
+      <td>0.021792</td>
+      <td>26.036837</td>
+      <td>1.000000</td>
+    </tr>
+    <tr>
+      <th>25%</th>
+      <td>0.040096</td>
+      <td>28.109933</td>
+      <td>4.750000</td>
+    </tr>
+    <tr>
+      <th>50%</th>
+      <td>0.045903</td>
+      <td>29.072047</td>
+      <td>8.500000</td>
+    </tr>
+    <tr>
+      <th>75%</th>
+      <td>0.062562</td>
+      <td>29.335980</td>
+      <td>12.250000</td>
+    </tr>
+    <tr>
+      <th>max</th>
+      <td>0.075233</td>
+      <td>30.082116</td>
+      <td>16.000000</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fs_long</span> <span class="o">=</span> <span class="n">fs</span><span class="o">.</span><span class="n">melt</span><span class="p">(</span><span class="s1">&#39;p_number&#39;</span><span class="p">,</span> <span class="n">var_name</span><span class="o">=</span><span class="s1">&#39;Pass&#39;</span><span class="p">,</span> <span class="n">value_name</span><span class="o">=</span><span class="s1">&#39;Fs&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="mi">7</span><span class="p">));</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">boxplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">fs</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;Words&#39;</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/words-feeltrace_115_0.png" src="_images/words-feeltrace_115_0.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="mi">7</span><span class="p">));</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">boxplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">fs</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;Feeltrace&#39;</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/words-feeltrace_116_0.png" src="_images/words-feeltrace_116_0.png" />
 </div>
 </div>
 <p>All results in the next sections are ordered according to p_number:</p>
@@ -2463,155 +2954,195 @@ Name: n_windows, dtype: float64
   <tbody>
     <tr>
       <th>0</th>
-      <td>10</td>
+      <td>8</td>
       <td>31</td>
     </tr>
     <tr>
       <th>1</th>
-      <td>12</td>
+      <td>9</td>
       <td>44</td>
     </tr>
     <tr>
       <th>2</th>
-      <td>13</td>
+      <td>10</td>
       <td>37</td>
     </tr>
     <tr>
       <th>3</th>
-      <td>15</td>
+      <td>11</td>
       <td>41</td>
     </tr>
     <tr>
       <th>4</th>
-      <td>17</td>
+      <td>12</td>
       <td>32</td>
     </tr>
     <tr>
       <th>5</th>
-      <td>19</td>
+      <td>13</td>
       <td>32</td>
     </tr>
     <tr>
       <th>6</th>
-      <td>2</td>
+      <td>1</td>
       <td>46</td>
     </tr>
     <tr>
       <th>7</th>
-      <td>20</td>
+      <td>14</td>
       <td>40</td>
     </tr>
     <tr>
       <th>8</th>
-      <td>22</td>
+      <td>15</td>
       <td>41</td>
     </tr>
     <tr>
       <th>9</th>
-      <td>23</td>
+      <td>16</td>
       <td>38</td>
     </tr>
     <tr>
       <th>10</th>
-      <td>4</td>
+      <td>2</td>
       <td>41</td>
     </tr>
     <tr>
       <th>11</th>
-      <td>5</td>
+      <td>3</td>
       <td>24</td>
     </tr>
     <tr>
       <th>12</th>
-      <td>6</td>
+      <td>4</td>
       <td>19</td>
     </tr>
     <tr>
       <th>13</th>
-      <td>7</td>
+      <td>5</td>
       <td>40</td>
     </tr>
     <tr>
       <th>14</th>
-      <td>8</td>
+      <td>6</td>
       <td>36</td>
     </tr>
     <tr>
       <th>15</th>
-      <td>9</td>
+      <td>7</td>
       <td>48</td>
     </tr>
   </tbody>
 </table>
 </div></div></div>
 </div>
-</div>
-<div class="section" id="id2">
-<h3>Granger Causality<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
-<p>TODO: summarize</p>
+<div class="section" id="id5">
+<h4>Granger Causality<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h4>
+<p>TODO: calculate power / effect size</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">granger_p_values</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">value</span> <span class="o">&lt;</span> <span class="mf">0.05</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">words_to_feeltrace</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">feeltrace_to_words</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">granger_p_values</span><span class="p">:</span>
+    <span class="n">words_to_feeltrace</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">value</span><span class="o">.</span><span class="n">Words_x</span><span class="o">.</span><span class="n">Feeltrace_y</span><span class="p">)</span>
+    <span class="n">feeltrace_to_words</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">value</span><span class="o">.</span><span class="n">Feeltrace_x</span><span class="o">.</span><span class="n">Words_y</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">statsmodels.stats.multitest</span> <span class="kn">import</span> <span class="n">multipletests</span>
+<span class="n">rejected</span><span class="p">,</span> <span class="n">p_adjusted</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">alpha_corrected</span> <span class="o">=</span> <span class="n">multipletests</span><span class="p">(</span><span class="n">words_to_feeltrace</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span> 
+                                                         <span class="n">method</span><span class="o">=</span><span class="s1">&#39;holm&#39;</span><span class="p">,</span> 
+                                                         <span class="n">is_sorted</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">returnsorted</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Rejected H0: %d&#39;</span> <span class="o">%</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">rejected</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Corrected alpha: %f&#39;</span> <span class="o">%</span> <span class="n">alpha_corrected</span><span class="p">)</span>
+
+<span class="n">sns</span><span class="o">.</span><span class="n">kdeplot</span><span class="p">(</span><span class="n">words_to_feeltrace</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">,</span> <span class="n">shade</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;raw&#39;</span><span class="p">)</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">kdeplot</span><span class="p">(</span><span class="n">p_adjusted</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;green&quot;</span><span class="p">,</span> <span class="n">shade</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;adujusted&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">xlim</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Distribution of p-values&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">();</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>             Words_x  Feeltrace_x
-Words_y        False         True
-Feeltrace_y     True        False
-             Words_x  Feeltrace_x
-Words_y        False         True
-Feeltrace_y     True        False
-             Words_x  Feeltrace_x
-Words_y        False         True
-Feeltrace_y    False        False
-             Words_x  Feeltrace_x
-Words_y        False         True
-Feeltrace_y    False        False
-             Words_x  Feeltrace_x
-Words_y        False         True
-Feeltrace_y     True        False
-             Words_x  Feeltrace_x
-Words_y        False         True
-Feeltrace_y    False        False
-             Words_x  Feeltrace_x
-Words_y        False        False
-Feeltrace_y     True        False
-             Words_x  Feeltrace_x
-Words_y        False         True
-Feeltrace_y    False        False
-             Words_x  Feeltrace_x
-Words_y        False         True
-Feeltrace_y    False        False
-             Words_x  Feeltrace_x
-Words_y        False         True
-Feeltrace_y     True        False
-             Words_x  Feeltrace_x
-Words_y        False         True
-Feeltrace_y     True        False
-             Words_x  Feeltrace_x
-Words_y        False         True
-Feeltrace_y     True        False
-             Words_x  Feeltrace_x
-Words_y        False         True
-Feeltrace_y     True        False
-             Words_x  Feeltrace_x
-Words_y        False         True
-Feeltrace_y     True        False
-             Words_x  Feeltrace_x
-Words_y        False         True
-Feeltrace_y     True        False
-             Words_x  Feeltrace_x
-Words_y        False         True
-Feeltrace_y    False        False
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Rejected H0: 8
+Corrected alpha: 0.003125
+</pre></div>
+</div>
+<img alt="_images/words-feeltrace_121_1.png" src="_images/words-feeltrace_121_1.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">statsmodels.stats.multitest</span> <span class="kn">import</span> <span class="n">multipletests</span>
+<span class="n">rejected</span><span class="p">,</span> <span class="n">p_adjusted</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">alpha_corrected</span> <span class="o">=</span> <span class="n">multipletests</span><span class="p">(</span><span class="n">feeltrace_to_words</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span> 
+                                                         <span class="n">method</span><span class="o">=</span><span class="s1">&#39;holm&#39;</span><span class="p">,</span> 
+                                                         <span class="n">is_sorted</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">returnsorted</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Rejected H0: %d&#39;</span> <span class="o">%</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">rejected</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Corrected alpha: %f&#39;</span> <span class="o">%</span> <span class="n">alpha_corrected</span><span class="p">)</span>
+
+<span class="n">sns</span><span class="o">.</span><span class="n">kdeplot</span><span class="p">(</span><span class="n">feeltrace_to_words</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">,</span> <span class="n">shade</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;raw&#39;</span><span class="p">)</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">kdeplot</span><span class="p">(</span><span class="n">p_adjusted</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;green&quot;</span><span class="p">,</span> <span class="n">shade</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;adujusted&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">xlim</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Distribution of p-values&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">();</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Rejected H0: 11
+Corrected alpha: 0.003125
+</pre></div>
+</div>
+<img alt="_images/words-feeltrace_122_1.png" src="_images/words-feeltrace_122_1.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">n_windows</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">p_adjusted</span> <span class="o">&lt;</span> <span class="mf">0.05</span><span class="p">,</span> <span class="s1">&#39;p_number&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>1      9
+2     10
+3     11
+4     12
+5     13
+7     14
+8     15
+10     2
+11     3
+12     4
+13     5
+Name: p_number, dtype: int64
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">n_windows</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">p_adjusted</span> <span class="o">&gt;=</span> <span class="mf">0.05</span><span class="p">,</span> <span class="s1">&#39;p_number&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0      8
+6      1
+9     16
+14     6
+15     7
+Name: p_number, dtype: int64
 </pre></div>
 </div>
 </div>
 </div>
 </div>
-<div class="section" id="id3">
-<h3>Cointegration<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id6">
+<h4>Cointegration<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h4>
 <p>TODO: summarize</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -2657,70 +3188,95 @@ Feeltrace_y    False        False
 </div>
 </div>
 </div>
-<div class="section" id="id4">
-<h3>Pearson’s correlation<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
-<p>TODO: calculate significance</p>
+<div class="section" id="id7">
+<h4>Pearson’s correlation<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h4>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pearsons_corr</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pearsons_corr_values</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">pearsons_corr</span><span class="p">]</span>
+<span class="n">pearsons_corr_p_values</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">pearsons_corr</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sns</span><span class="o">.</span><span class="n">kdeplot</span><span class="p">(</span><span class="n">pearsons_corr_values</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">,</span> <span class="n">shade</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;rho&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Distribution of correlation values&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">();</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[              Words  Feeltrace
- Words      1.000000   0.365165
- Feeltrace  0.365165   1.000000,
-               Words  Feeltrace
- Words      1.000000  -0.272041
- Feeltrace -0.272041   1.000000,
-               Words  Feeltrace
- Words      1.000000   0.055989
- Feeltrace  0.055989   1.000000,
-               Words  Feeltrace
- Words      1.000000   0.035617
- Feeltrace  0.035617   1.000000,
-               Words  Feeltrace
- Words      1.000000   0.012927
- Feeltrace  0.012927   1.000000,
-               Words  Feeltrace
- Words      1.000000   0.277778
- Feeltrace  0.277778   1.000000,
-               Words  Feeltrace
- Words      1.000000   0.182896
- Feeltrace  0.182896   1.000000,
-               Words  Feeltrace
- Words      1.000000   0.135889
- Feeltrace  0.135889   1.000000,
-               Words  Feeltrace
- Words      1.000000   0.069471
- Feeltrace  0.069471   1.000000,
-               Words  Feeltrace
- Words      1.000000  -0.078489
- Feeltrace -0.078489   1.000000,
-               Words  Feeltrace
- Words      1.000000   0.246664
- Feeltrace  0.246664   1.000000,
-               Words  Feeltrace
- Words      1.000000   0.496706
- Feeltrace  0.496706   1.000000,
-               Words  Feeltrace
- Words      1.000000   0.476936
- Feeltrace  0.476936   1.000000,
-               Words  Feeltrace
- Words      1.000000  -0.279489
- Feeltrace -0.279489   1.000000,
-               Words  Feeltrace
- Words      1.000000   0.391853
- Feeltrace  0.391853   1.000000,
-               Words  Feeltrace
- Words      1.000000   0.039069
- Feeltrace  0.039069   1.000000]
+<img alt="_images/words-feeltrace_129_0.png" src="_images/words-feeltrace_129_0.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">rejected</span><span class="p">,</span> <span class="n">p_adjusted</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">alpha_corrected</span> <span class="o">=</span> <span class="n">multipletests</span><span class="p">(</span><span class="n">pearsons_corr_p_values</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span> 
+                                                         <span class="n">method</span><span class="o">=</span><span class="s1">&#39;holm&#39;</span><span class="p">,</span> 
+                                                         <span class="n">is_sorted</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">returnsorted</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Rejected H0: %d&#39;</span> <span class="o">%</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">rejected</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Corrected alpha: %f&#39;</span> <span class="o">%</span> <span class="n">alpha_corrected</span><span class="p">)</span>
+
+<span class="n">sns</span><span class="o">.</span><span class="n">kdeplot</span><span class="p">(</span><span class="n">feeltrace_to_words</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">,</span> <span class="n">shade</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;raw&#39;</span><span class="p">)</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">kdeplot</span><span class="p">(</span><span class="n">p_adjusted</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;green&quot;</span><span class="p">,</span> <span class="n">shade</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;adujusted&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">xlim</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Distribution of p-values&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">();</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Rejected H0: 0
+Corrected alpha: 0.003125
+</pre></div>
+</div>
+<img alt="_images/words-feeltrace_130_1.png" src="_images/words-feeltrace_130_1.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">n_windows</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">p_adjusted</span> <span class="o">&lt;</span> <span class="mf">0.05</span><span class="p">,</span> <span class="s1">&#39;p_number&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Series([], Name: p_number, dtype: int64)
 </pre></div>
 </div>
 </div>
 </div>
-<div class="section" id="id5">
-<h4>VAR Model<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h4>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">n_windows</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">p_adjusted</span> <span class="o">&gt;=</span> <span class="mf">0.05</span><span class="p">,</span> <span class="s1">&#39;p_number&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0      8
+1      9
+2     10
+3     11
+4     12
+5     13
+6      1
+7     14
+8     15
+9     16
+10     2
+11     3
+12     4
+13     5
+14     6
+15     7
+Name: p_number, dtype: int64
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="id8">
+<h4>VAR Model<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h4>
 <p>TODO:</p>
 <ul class="simple">
 <li><p>Summarize VAR model results</p></li>
@@ -3615,7 +4171,7 @@ Feeltrace_y    False        False
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="_images/words-feeltrace_109_0.png" src="_images/words-feeltrace_109_0.png" />
+<img alt="_images/words-feeltrace_147_0.png" src="_images/words-feeltrace_147_0.png" />
 </div>
 </div>
 <div class="cell docutils container">
@@ -3780,7 +4336,7 @@ Feeltrace_y    False        False
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="_images/words-feeltrace_113_0.png" src="_images/words-feeltrace_113_0.png" />
+<img alt="_images/words-feeltrace_151_0.png" src="_images/words-feeltrace_151_0.png" />
 </div>
 </div>
 </div>
@@ -3808,7 +4364,7 @@ Feeltrace_y    False        False
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="_images/words-feeltrace_115_0.png" src="_images/words-feeltrace_115_0.png" />
+<img alt="_images/words-feeltrace_153_0.png" src="_images/words-feeltrace_153_0.png" />
 </div>
 </div>
 <div class="cell docutils container">
@@ -3900,12 +4456,12 @@ Feeltrace_y    False        False
     <span class="n">pass_distance</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s1">&#39;p_number&#39;</span><span class="p">:</span> <span class="n">subject</span><span class="o">.</span><span class="n">p_number</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s1">&#39;Distance&#39;</span><span class="p">:</span> <span class="n">distance</span><span class="o">.</span><span class="n">euclidean</span><span class="p">(</span><span class="n">subject_interview</span><span class="p">,</span> <span class="n">subject_feeltrace</span><span class="p">)})</span>
 
 <span class="n">pass_distance</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">pass_distance</span><span class="p">)</span>
-<span class="n">sns</span><span class="o">.</span><span class="n">barplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">pass_distance</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s1">&#39;p_number&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;Distance&#39;</span><span class="p">);</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">boxplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">pass_distance</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;Distance&#39;</span><span class="p">);</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="_images/words-feeltrace_117_0.png" src="_images/words-feeltrace_117_0.png" />
+<img alt="_images/words-feeltrace_155_0.png" src="_images/words-feeltrace_155_0.png" />
 </div>
 </div>
 </div>
@@ -3992,7 +4548,7 @@ Feeltrace_y    False        False
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="_images/words-feeltrace_122_0.png" src="_images/words-feeltrace_122_0.png" />
+<img alt="_images/words-feeltrace_160_0.png" src="_images/words-feeltrace_160_0.png" />
 </div>
 </div>
 <div class="cell docutils container">
@@ -4032,7 +4588,7 @@ Feeltrace_y    False        False
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="_images/words-feeltrace_123_0.png" src="_images/words-feeltrace_123_0.png" />
+<img alt="_images/words-feeltrace_161_0.png" src="_images/words-feeltrace_161_0.png" />
 </div>
 </div>
 </div>

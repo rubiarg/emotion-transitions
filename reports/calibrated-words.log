@@ -22,29 +22,25 @@ min_ = pd.Series(map(lambda x: x*1.2 if  x < 0 else x*0.8, X_ed.min()), ['Inerti
 ------------------
 
 [0;31m---------------------------------------------------------------------------[0m
-[0;31mTypeError[0m                                 Traceback (most recent call last)
-[0;32m/var/folders/bl/2tw1vrc12mv_hqpbdf1j3wkw0000gn/T/ipykernel_60916/1448172652.py[0m in [0;36m<module>[0;34m[0m
+[0;31mValueError[0m                                Traceback (most recent call last)
+[0;32m/var/folders/bl/2tw1vrc12mv_hqpbdf1j3wkw0000gn/T/ipykernel_89323/1448172652.py[0m in [0;36m<module>[0;34m[0m
 [0;32m----> 1[0;31m [0mmax_[0m [0;34m=[0m [0mpd[0m[0;34m.[0m[0mSeries[0m[0;34m([0m[0mmap[0m[0;34m([0m[0;32mlambda[0m [0mx[0m[0;34m:[0m [0mx[0m[0;34m*[0m[0;36m1.2[0m [0;32mif[0m  [0mx[0m [0;34m>[0m [0;36m0[0m [0;32melse[0m [0mx[0m[0;34m*[0m[0;36m0.8[0m[0;34m,[0m [0mX_ed[0m[0;34m.[0m[0mmax[0m[0;34m([0m[0;34m)[0m[0;34m)[0m[0;34m,[0m [0;34m[[0m[0;34m'Inertia'[0m[0;34m,[0m [0;34m'Instability'[0m[0;34m,[0m [0;34m'Variability'[0m[0;34m][0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
 [0m[1;32m      2[0m [0mmin_[0m [0;34m=[0m [0mpd[0m[0;34m.[0m[0mSeries[0m[0;34m([0m[0mmap[0m[0;34m([0m[0;32mlambda[0m [0mx[0m[0;34m:[0m [0mx[0m[0;34m*[0m[0;36m1.2[0m [0;32mif[0m  [0mx[0m [0;34m<[0m [0;36m0[0m [0;32melse[0m [0mx[0m[0;34m*[0m[0;36m0.8[0m[0;34m,[0m [0mX_ed[0m[0;34m.[0m[0mmin[0m[0;34m([0m[0;34m)[0m[0;34m)[0m[0;34m,[0m [0;34m[[0m[0;34m'Inertia'[0m[0;34m,[0m [0;34m'Instability'[0m[0;34m,[0m [0;34m'Variability'[0m[0;34m][0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
 
 [0;32m~/.virtualenvs/cpsc554x/lib/python3.9/site-packages/pandas/core/series.py[0m in [0;36m__init__[0;34m(self, data, index, dtype, name, copy, fastpath)[0m
-[1;32m    421[0m                 [0;32mpass[0m[0;34m[0m[0;34m[0m[0m
-[1;32m    422[0m             [0;32melse[0m[0;34m:[0m[0;34m[0m[0;34m[0m[0m
-[0;32m--> 423[0;31m                 [0mdata[0m [0;34m=[0m [0mcom[0m[0;34m.[0m[0mmaybe_iterable_to_list[0m[0;34m([0m[0mdata[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
-[0m[1;32m    424[0m [0;34m[0m[0m
-[1;32m    425[0m             [0;32mif[0m [0mindex[0m [0;32mis[0m [0;32mNone[0m[0;34m:[0m[0;34m[0m[0;34m[0m[0m
+[1;32m    428[0m                 [0mindex[0m [0;34m=[0m [0mibase[0m[0;34m.[0m[0mdefault_index[0m[0;34m([0m[0mlen[0m[0;34m([0m[0mdata[0m[0;34m)[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+[1;32m    429[0m             [0;32melif[0m [0mis_list_like[0m[0;34m([0m[0mdata[0m[0;34m)[0m[0;34m:[0m[0;34m[0m[0;34m[0m[0m
+[0;32m--> 430[0;31m                 [0mcom[0m[0;34m.[0m[0mrequire_length_match[0m[0;34m([0m[0mdata[0m[0;34m,[0m [0mindex[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+[0m[1;32m    431[0m [0;34m[0m[0m
+[1;32m    432[0m             [0;31m# create/copy the manager[0m[0;34m[0m[0;34m[0m[0;34m[0m[0m
 
-[0;32m~/.virtualenvs/cpsc554x/lib/python3.9/site-packages/pandas/core/common.py[0m in [0;36mmaybe_iterable_to_list[0;34m(obj)[0m
-[1;32m    290[0m     """
-[1;32m    291[0m     [0;32mif[0m [0misinstance[0m[0;34m([0m[0mobj[0m[0;34m,[0m [0mabc[0m[0;34m.[0m[0mIterable[0m[0;34m)[0m [0;32mand[0m [0;32mnot[0m [0misinstance[0m[0;34m([0m[0mobj[0m[0;34m,[0m [0mabc[0m[0;34m.[0m[0mSized[0m[0;34m)[0m[0;34m:[0m[0;34m[0m[0;34m[0m[0m
-[0;32m--> 292[0;31m         [0;32mreturn[0m [0mlist[0m[0;34m([0m[0mobj[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
-[0m[1;32m    293[0m     [0mobj[0m [0;34m=[0m [0mcast[0m[0;34m([0m[0mCollection[0m[0;34m,[0m [0mobj[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
-[1;32m    294[0m     [0;32mreturn[0m [0mobj[0m[0;34m[0m[0;34m[0m[0m
+[0;32m~/.virtualenvs/cpsc554x/lib/python3.9/site-packages/pandas/core/common.py[0m in [0;36mrequire_length_match[0;34m(data, index)[0m
+[1;32m    529[0m     """
+[1;32m    530[0m     [0;32mif[0m [0mlen[0m[0;34m([0m[0mdata[0m[0;34m)[0m [0;34m!=[0m [0mlen[0m[0;34m([0m[0mindex[0m[0;34m)[0m[0;34m:[0m[0;34m[0m[0;34m[0m[0m
+[0;32m--> 531[0;31m         raise ValueError(
+[0m[1;32m    532[0m             [0;34m"Length of values "[0m[0;34m[0m[0;34m[0m[0m
+[1;32m    533[0m             [0;34mf"({len(data)}) "[0m[0;34m[0m[0;34m[0m[0m
 
-[0;32m/var/folders/bl/2tw1vrc12mv_hqpbdf1j3wkw0000gn/T/ipykernel_60916/1448172652.py[0m in [0;36m<lambda>[0;34m(x)[0m
-[0;32m----> 1[0;31m [0mmax_[0m [0;34m=[0m [0mpd[0m[0;34m.[0m[0mSeries[0m[0;34m([0m[0mmap[0m[0;34m([0m[0;32mlambda[0m [0mx[0m[0;34m:[0m [0mx[0m[0;34m*[0m[0;36m1.2[0m [0;32mif[0m  [0mx[0m [0;34m>[0m [0;36m0[0m [0;32melse[0m [0mx[0m[0;34m*[0m[0;36m0.8[0m[0;34m,[0m [0mX_ed[0m[0;34m.[0m[0mmax[0m[0;34m([0m[0;34m)[0m[0;34m)[0m[0;34m,[0m [0;34m[[0m[0;34m'Inertia'[0m[0;34m,[0m [0;34m'Instability'[0m[0;34m,[0m [0;34m'Variability'[0m[0;34m][0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
-[0m[1;32m      2[0m [0mmin_[0m [0;34m=[0m [0mpd[0m[0;34m.[0m[0mSeries[0m[0;34m([0m[0mmap[0m[0;34m([0m[0;32mlambda[0m [0mx[0m[0;34m:[0m [0mx[0m[0;34m*[0m[0;36m1.2[0m [0;32mif[0m  [0mx[0m [0;34m<[0m [0;36m0[0m [0;32melse[0m [0mx[0m[0;34m*[0m[0;36m0.8[0m[0;34m,[0m [0mX_ed[0m[0;34m.[0m[0mmin[0m[0;34m([0m[0;34m)[0m[0;34m)[0m[0;34m,[0m [0;34m[[0m[0;34m'Inertia'[0m[0;34m,[0m [0;34m'Instability'[0m[0;34m,[0m [0;34m'Variability'[0m[0;34m][0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
-
-[0;31mTypeError[0m: '>' not supported between instances of 'str' and 'int'
-TypeError: '>' not supported between instances of 'str' and 'int'
+[0;31mValueError[0m: Length of values (4) does not match length of index (3)
+ValueError: Length of values (4) does not match length of index (3)
 
